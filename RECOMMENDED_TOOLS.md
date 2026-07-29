@@ -19,7 +19,7 @@ A comprehensive, categorized reference guide to popular open-source and self-hos
 4. [Monitoring, Logging & Observability](#4-monitoring-logging--observability)
 5. [Storage, Cloud & Photo Management](#5-storage-cloud--photo-management)
 6. [Security, Password Management & Auth](#6-security-password-management--auth)
-7. [Productivity, Tasks, Notes & Finance](#7-productivity-tasks-notes--finance)
+7. [Productivity, Documents & Knowledge Bases](#7-productivity-documents--knowledge-bases)
 8. [Home Automation & IoT](#8-home-automation--iot)
 9. [Sysadmin, DevOps & Container Utilities](#9-sysadmin-devops--container-utilities)
 
@@ -51,7 +51,6 @@ A comprehensive, categorized reference guide to popular open-source and self-hos
 | App / Tool | Category | Port | Footprint | Tech Stack & Database | Storage | Description |
 | :--- | :--- | :---: | :---: | :--- | :--- | :--- |
 | **Dashy** | Dashboard | `7575` | 🟢 Lightweight | `Vue.js` / `YAML Config (No DB)` | SSD | Feature-rich, highly customizable homelab dashboard with CSS themes. |
-| **Homepage** | Dashboard | `3000` | 🟢 Lightweight | `Next.js / React` / `YAML Config (No DB)` | SSD | Highly customizable, YAML-configured dashboard with service integration badges. |
 | **Homarr** | Dashboard | `7575` | 🟢 Lightweight | `Next.js / Node.js` / `SQLite` | SSD / HDD | Customizable dashboard with real-time Docker integration widgets. |
 | **Glance** | All-in-One Feed | `8080` | ⚡ Ultra-Light | `Go` / `YAML Config (No DB)` | SSD | Ultra-fast feed aggregator for RSS, Reddit, weather, and server status. |
 | **Linkwarden** | Bookmarks | `3000` | 🟡 Moderate | `TypeScript / Next.js` / `PostgreSQL` | SSD | Self-hosted bookmark manager that archives webpages and PDFs automatically. |
@@ -101,6 +100,7 @@ A comprehensive, categorized reference guide to popular open-source and self-hos
 | **Syncthing** | Continuous File Sync | `8384` | 🟢 Lightweight | `Go` / `LevelDB` | HDD | Decentralized, peer-to-peer file synchronization between devices. |
 | **Seafile** | High-Speed Cloud | `8000` | 🟡 Moderate | `C / Python` / `MariaDB + Memcached` | HDD | Fast, reliable self-hosted file syncing solution for large document libraries. |
 | **Kopia** | Encrypted Backup | `5115` | 🟢 Lightweight | `Go / Vue` / `Flat Files` | HDD | Fast, secure backup tool with deduplication, compression, and encryption. |
+| **Mealie** | Recipe & Meal Planner| `9000` | 🟢 Lightweight | `Python (FastAPI) / Vue` / `SQLite / Postgres` | SSD | Recipe manager and meal planner with automatic web scraping. |
 
 ---
 
@@ -116,26 +116,26 @@ A comprehensive, categorized reference guide to popular open-source and self-hos
 
 ---
 
-## 7. Productivity, Tasks, Notes & Finance
+## 7. Productivity, Documents & Knowledge Bases
 
 | App / Tool | Category | Port | Footprint | Tech Stack & Database | Storage | Description |
 | :--- | :--- | :---: | :---: | :--- | :--- | :--- |
-| **Leantime** | Project Management | `8090` | 🟡 Moderate | `PHP / Vue` / `MariaDB / MySQL` | SSD | Active in host setup. Lean project management platform with Kanban, milestones & time tracking. |
-| **Vikunja** | Tasks & Todos | `3456` | 🟢 Lightweight | `Go / Vue` / `SQLite / Postgres` | SSD | Full-featured task and todo manager (Todoist alternative) with lists, kanban & Gantt charts. |
-| **AppFlowy** | Workspace / Notes | `80` | 🟢 Lightweight | `Flutter / Rust` / `SQLite` | SSD | Open-source Notion alternative for notes, wikis, and database tables with local privacy. |
-| **Focalboard** | Kanban & Tasks | `8000` | 🟢 Lightweight | `Go / React` / `SQLite / Postgres` | SSD | Open-source Trello/Notion board alternative by Mattermost for task tracking. |
-| **Paperless-ngx** | Document OCR | `8000` | 🟡 Moderate | `Python (Django) / Angular` / `PostgreSQL + Redis + Tesseract` | SSD + HDD | Converts physical papers into searchable digital PDFs via OCR. *(Spikes CPU during OCR)* |
-| **Stirling-PDF** | PDF Utility Suite | `8080` | 🟡 Moderate | `Java (Spring Boot)` / `Stateless (No DB)` | Stateless | Browser utility for merging, splitting, compressing, password-protecting, and converting PDFs. |
-| **Outline** | Knowledge Base | `3000` | 🟡 Moderate | `Node.js / React` / `PostgreSQL + Redis` | SSD | Fast, collaborative team wiki and documentation hub with clean Markdown editing. |
-| **BookStack** | Wiki Engine | `8080` | 🟡 Moderate | `PHP (Laravel)` / `MariaDB / MySQL` | SSD | Organized, book-structured wiki platform for team & personal documentation. |
-| **Trilium Notes** | Hierarchical Notes | `8080` | 🟢 Lightweight | `Node.js` / `SQLite` | SSD | Hierarchical note-taking app designed for building large personal knowledge bases. |
+| **Leantime** | Project Management | `8090` | 🟡 Moderate | `PHP / Vue` / `MariaDB / MySQL` | SSD | Lean project management platform designed for developers and teams. |
+| **Vikunja** | Task & ToDo Manager | `3456` | 🟢 Lightweight | `Go / Vue` / `SQLite / Postgres` | SSD | Feature-rich task manager with ToDo lists, Kanban, Gantt charts, and reminders. |
+| **BookStack** | Wiki & Documentation | `8080` | 🟡 Moderate | `PHP (Laravel)` / `MariaDB / MySQL` | SSD | Highly organized, book-structured wiki platform for team documentation. |
+| **Outline** | Knowledge Base | `3000` | 🟡 Moderate | `Node.js / React` / `PostgreSQL + Redis` | SSD | Fast, collaborative wiki and knowledge base editor with markdown support. |
+| **Wiki.js** | Wiki Engine | `3000` | 🟢 Lightweight | `Node.js` / `PostgreSQL / SQLite` | SSD | Modern wiki engine supporting Git sync, Markdown, and WYSIWYG. |
+| **Paperless-ngx** | Document OCR | `8000` | 🟡 Moderate | `Python (Django) / Angular` / `PostgreSQL + Redis + Tesseract OCR` | SSD + HDD | Converts physical papers into searchable digital PDFs via OCR. *(Spikes CPU during OCR)* |
+| **Trilium Notes** | Knowledge Base | `8080` | 🟢 Lightweight | `Node.js` / `SQLite` | SSD | Hierarchical note-taking app with mind mapping and code editing capabilities. |
 | **Memos** | Micro-Notes | `5230` | ⚡ Ultra-Light | `Go / React` / `SQLite` | SSD | Privacy-first, lightweight memo hub for quick micro-thoughts (Twitter/Flomo style). |
-| **Kimai** | Time Tracking | `8001` | 🟢 Lightweight | `PHP (Symfony) / Twig` / `MySQL / MariaDB` | SSD | Time tracking app for tracking work hours, projects, rates, and generating invoices. |
-| **Invoice Ninja** | Invoicing & Expenses| `8000` | 🟡 Moderate | `PHP (Laravel) / Flutter` / `MySQL / MariaDB` | SSD | Professional self-hosted invoicing, expense tracking, and client portal app. |
-| **Firefly III** | Personal Finance | `8080` | 🟢 Lightweight | `PHP (Laravel)` / `MariaDB / Postgres` | SSD | Personal finance manager supporting budget tracking, recurring bills, and expense analytics. |
-| **Actual Budget** | Envelope Budgeting | `5006` | ⚡ Ultra-Light | `Node.js / React` / `SQLite` | SSD | Local-first, envelope budgeting application (YNAB alternative) with web & mobile sync. |
-| **CryptPad** | E2E Collab Suite | `3000` | 🟢 Lightweight | `Node.js` / `Flat Files` | SSD | End-to-end encrypted collaborative suite (Docs, Sheets, Code, Kanban, Polls). |
-| **Mealie** | Recipe & Meal Planner| `9000` | 🟢 Lightweight | `Python (FastAPI) / Vue` / `SQLite / Postgres` | SSD | Recipe manager and meal planner with automatic web scraping and shopping lists. |
+| **Stirling-PDF** | PDF Utility Suite | `8080` | 🟡 Moderate | `Java (Spring Boot)` / `Stateless (No DB)` | Stateless | Browser utility for merging, splitting, compressing, and editing PDFs. |
+| **Actual Budget** | Personal Finance | `5006` | ⚡ Ultra-Light | `Node.js / React` / `SQLite` | SSD | Privacy-first, fast local personal finance manager with multi-device sync. |
+| **Firefly III** | Personal Finance | `8080` | 🟡 Moderate | `PHP (Laravel)` / `MariaDB / Postgres` | SSD | Detailed manager for tracking personal expenses, budgets, and bank imports. |
+| **Hoarder** | Bookmark & Curation | `3000` | 🟡 Moderate | `TypeScript / Next.js` / `PostgreSQL + Meilisearch` | SSD | AI-powered bookmarking app with automatic tagging, OCR, and full-page archiving. |
+| **Wallabag** | Read-It-Later | `80` | 🟢 Lightweight | `PHP (Symfony)` / `SQLite / Postgres` | SSD | Save articles and web pages for offline reading in clean text view (Pocket alternative). |
+| **Open WebUI** | AI Productivity Hub | `8080` | 🟢 Lightweight | `Python (FastAPI) / Svelte` / `SQLite` | SSD | Sleek, self-hosted ChatGPT-style UI for interacting with local LLMs (Ollama). |
+| **Planka** | Kanban Board | `1337` | 🟢 Lightweight | `Node.js / React` / `PostgreSQL` | SSD | Elegant real-time Kanban board for project and task tracking (Trello alternative). |
+| **Affine** | Hyper-Workspace | `3000` | 🔴 Heavy | `TypeScript / Rust` / `PostgreSQL + Redis` | SSD | Privacy-first workspace combining documents, whiteboards, and tables (Notion/Miro alternative). |
 | **ChangeDetection.io**| Website Monitor| `5000` | 🟢 Lightweight | `Python` / `SQLite` | SSD | Automated web page change monitoring and notification tool. |
 
 ---
@@ -167,5 +167,5 @@ A comprehensive, categorized reference guide to popular open-source and self-hos
 
 ## 💡 Summary Comparison
 
-- **Top Lightweight Champions (Minimal RAM & Storage)**: `Vaultwarden` (Rust), `Cloudflare Tunnel` (Go), `Actual Budget` (Node/SQLite), `Memos` (Go), `Dockge` (Node/Vue), `Navidrome` (Go), `Glance` (Go), `AdGuard Home` (Go), `Filebrowser` (Go), `Portainer` (Go), `Dozzle` (Go), `ntfy` (Go).
+- **Top Lightweight Champions (Minimal RAM & Storage)**: `Vaultwarden` (Rust), `Cloudflare Tunnel` (Go), `Dockge` (Node/Vue), `Memos` (Go), `Navidrome` (Go), `Glance` (Go), `AdGuard Home` (Go), `Filebrowser` (Go), `Portainer` (Go), `Dozzle` (Go), `ntfy` (Go).
 - **Heavyweight / Enterprise Suites**: `Immich` (Postgres + Redis + Machine Learning Workers), `Nextcloud` (PHP + Postgres/MariaDB + Redis), `Authentik` (Python + Postgres + Redis).
