@@ -29,7 +29,7 @@ All active services deployed within this repository:
 | **Cloudflare Tunnel** | Core / Ingress | Outbound | Container | Host daemon | Zero Trust encrypted tunnel to Cloudflare |
 | **Portainer** | Core / Mgmt | `9000`, `9443` | SSD / HDD | `${HDD_DATA_DIR}/docker/volumes/portainer` | Container lifecycle & Docker stack management |
 | **Uptime Kuma** | Core / Status | `3001` | SSD / HDD | `${HDD_DATA_DIR}/docker/volumes/uptime-kuma` | Real-time monitoring & status pages |
-| **Homarr** | Dashboard | `7575` | SSD / HDD | `${HDD_DATA_DIR}/docker/volumes/homarr/appdata` | Dynamic homelab dashboard and application hub |
+| **Dashy** | Dashboard | `7575` | SSD | `${SSD_DATA_DIR}/dashy/conf.yml` | Feature-rich, highly customizable homelab dashboard |
 | **IT-Tools** | Utilities | `8091` | Stateless | N/A | Handy developer & sysadmin utilities web app |
 | **Leantime** | Management | `8090` | SSD | `${SSD_DATA_DIR}/leantime/config` | Lean project management platform |
 | **Leantime MariaDB** | Database | Internal (`3306`) | SSD | `${SSD_DATA_DIR}/leantime/mysql` | Database backend for Leantime |
@@ -51,9 +51,9 @@ All active services deployed within this repository:
 ├── SECURITY.md                    # Security best practices & hardening guide
 ├── docker-compose.yml             # Master Docker Compose file (utilizes 'include')
 ├── apps/                          # Modular application stacks
-│   ├── core/                      # Core infrastructure (NPM, Portainer, Uptime Kuma)
+│   ├── core/                      # Core infrastructure (Portainer, Uptime Kuma)
 │   │   └── docker-compose.yml
-│   ├── dashboard/                 # User dashboard & tools (Homarr, IT-Tools)
+│   ├── dashboard/                 # User dashboard & tools (Dashy, IT-Tools)
 │   │   └── docker-compose.yml
 │   ├── management/                # Project management (Leantime + MariaDB)
 │   │   └── docker-compose.yml
@@ -116,14 +116,14 @@ docker compose -f apps/monitoring/docker-compose.yml up -d
 All web applications are connected via the `homelab` Docker network and exposed through Cloudflare Tunnels:
 
 1. **Outbound Encrypted Tunnel**: `cloudflared` initiates an outbound connection to Cloudflare edge networks without requiring inbound port forwarding (80/443).
-2. **Container Hostname Routing**: Cloudflare Public Hostnames route incoming requests directly to internal Docker service names over the `homelab` network (e.g. `http://jellyfin:8096`, `http://homarr:7575`, `http://grafana:3000`).
+2. **Container Hostname Routing**: Cloudflare Public Hostnames route incoming requests directly to internal Docker service names over the `homelab` network (e.g. `http://jellyfin:8096`, `http://dashy:8080`, `http://grafana:3000`).
 3. **Zero Trust & Edge Security**: TLS termination, DDoS mitigation, and Access rules are enforced at the Cloudflare Edge.
 
 ## 🏠 CasaOS Coexistence
 
 If running alongside CasaOS:
 - CasaOS web UI runs on port `80` or custom port.
-- This homelab repository uses explicit host port mappings (`8081` for NPM admin, `7575` for Homarr, `8090` for Leantime, etc.) to prevent port conflicts with CasaOS host applications.
+- This homelab repository uses explicit host port mappings (`7575` for Dashy, `8090` for Leantime, etc.) to prevent port conflicts with CasaOS host applications.
 - Docker containers deployed via CasaOS UI can easily join the `homelab` external network.
 
 ## 🤝 Maintenance & Support
@@ -133,3 +133,4 @@ If running alongside CasaOS:
 - **Stop All Services**: `docker compose down`
 
 For detailed operational procedures, backup strategies, and recovery steps, see [DEPLOYMENT.md](DEPLOYMENT.md).
+For a comprehensive catalog of popular self-hosted applications and tools, see [RECOMMENDED_TOOLS.md](RECOMMENDED_TOOLS.md).

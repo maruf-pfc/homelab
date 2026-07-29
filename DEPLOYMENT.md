@@ -46,7 +46,7 @@ docker compose up -d
 # Core Services (NPM, Portainer, Uptime Kuma)
 docker compose -f apps/core/docker-compose.yml up -d
 
-# Dashboard Services (Homarr, IT-Tools)
+# Dashboard Services (Dashy, IT-Tools)
 docker compose -f apps/dashboard/docker-compose.yml up -d
 
 # Management Services (Leantime, MariaDB)

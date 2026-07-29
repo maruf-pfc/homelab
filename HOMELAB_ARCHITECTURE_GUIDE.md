@@ -28,7 +28,7 @@ flowchart TD
             end
             
             subgraph Dash["Dashboard & Tools"]
-                HOM["Homarr Dashboard (Port 7575)"]
+                DSH["Dashy Dashboard (Port 7575)"]
                 ITT["IT-Tools (Port 8091)"]
             end
             
@@ -46,7 +46,7 @@ flowchart TD
     end
 
     CF <==>|Encrypted Tunnel Connection| CFT
-    CFT -->|Internal Route| HOM
+    CFT -->|Internal Route| DSH
     CFT -->|Internal Route| JEL
     CFT -->|Internal Route| LEAN
     CFT -->|Internal Route| GRAF
@@ -76,7 +76,7 @@ flowchart LR
         subgraph HDD["HDD Storage Tier (/home/maruf/MyHDDStorage)"]
             HDD_MEDIA["Jellyfin Media Library\n(Movies, Music, Photos, TV)"]
             HDD_PROM["Prometheus Metric History"]
-            HDD_VOLS["Persistent App Volumes\n(Portainer, Kuma, Homarr)"]
+            HDD_VOLS["Persistent App Volumes\n(Portainer, Kuma, Dashy)"]
             HDD_BACKUP["Compressed Backup Archives"]
         end
         

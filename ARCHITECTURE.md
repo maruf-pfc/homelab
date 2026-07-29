@@ -41,7 +41,7 @@ A core design principle of this homelab is **Storage Tiering**, which optimizes 
 - **Assigned Workloads**:
   - Jellyfin media library files (`/home/maruf/MyHDDStorage/Jellyfin` containing `Movies`, `Music`, `Photos`, `TV`).
   - Prometheus time-series metrics storage (`/home/maruf/MyHDDStorage/monitoring/prometheus`).
-  - Large persistent container volume stores (`Portainer`, `Uptime Kuma`, `Homarr`).
+  - Large persistent container volume stores (`Portainer`, `Uptime Kuma`, `Dashy`).
 
 ---
 
@@ -66,7 +66,7 @@ All homelab services are attached to a custom bridge network named `homelab`.
      ┌───────────────┬───────────┼───────────┬───────────────┐
      ▼               ▼           ▼           ▼               ▼
 ┌─────────┐    ┌──────────┐ ┌─────────┐ ┌─────────┐    ┌────────────┐
-│ Homarr  │    │ Jellyfin │ │Leantime │ │ Grafana │    │Uptime Kuma │
+│  Dashy  │    │ Jellyfin │ │Leantime │ │ Grafana │    │Uptime Kuma │
 │  :7575  │    │  :8096   │ │  :8090  │ │  :3005  │    │   :3001    │
 └─────────┘    └──────────┘ └─────────┘ └─────────┘    └────────────┘
 ```

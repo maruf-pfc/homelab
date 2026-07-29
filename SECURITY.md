@@ -31,4 +31,4 @@ Security and confidentiality are top priorities when maintaining a public or pri
   sudo ufw allow 22/tcp  # SSH access from local network
   sudo ufw enable
   ```
-- **Docker Socket Security**: Containers with Docker socket mounts (`/var/run/docker.sock`) such as Portainer and Homarr have elevated control over the host. Keep image tags updated and limit container exposure.
+- **Docker Socket Security**: Containers with Docker socket mounts (`/var/run/docker.sock`) such as Portainer have elevated control over the host. Keep image tags updated and limit container exposure.
