@@ -1,7 +1,7 @@
 # 🏗️ Homelab Comprehensive Architecture & Expansion Guide
 
 > [!NOTE]
-> **Audit Status**: Your live setup is operating cleanly. All 12 services remain online, routing through Cloudflare and Nginx Proxy Manager on the `homelab` network. No configuration, storage path, or network setting was broken.
+> **Audit Status**: Your live setup is operating cleanly. All services remain online, routing securely via **Cloudflare Tunnels (`cloudflared`)** on the `homelab` Docker network.
 
 ---
 
@@ -16,7 +16,7 @@ flowchart TD
     end
 
     subgraph Host["Homelab Host Server (Ubuntu/Debian + CasaOS)"]
-        NPM["Nginx Proxy Manager\n(Port 80/443/8081)"]
+        CFT["Cloudflare Tunnel Daemon\n(cloudflared container)"]
         
         subgraph Net["Docker Network: homelab"]
             direction TB
@@ -45,13 +45,13 @@ flowchart TD
         end
     end
 
-    CF -->|HTTPS| NPM
-    NPM -->|Internal Proxy| HOM
-    NPM -->|Internal Proxy| JEL
-    NPM -->|Internal Proxy| LEAN
-    NPM -->|Internal Proxy| GRAF
-    NPM -->|Internal Proxy| PRT
-    NPM -->|Internal Proxy| KUMA
+    CF <==>|Encrypted Tunnel Connection| CFT
+    CFT -->|Internal Route| HOM
+    CFT -->|Internal Route| JEL
+    CFT -->|Internal Route| LEAN
+    CFT -->|Internal Route| GRAF
+    CFT -->|Internal Route| PRT
+    CFT -->|Internal Route| KUMA
 
     PROM -->|Scrape| NODE
     PROM -->|Scrape| CADV
@@ -76,7 +76,7 @@ flowchart LR
         subgraph HDD["HDD Storage Tier (/home/maruf/MyHDDStorage)"]
             HDD_MEDIA["Jellyfin Media Library\n(Movies, Music, Photos, TV)"]
             HDD_PROM["Prometheus Metric History"]
-            HDD_VOLS["Persistent App Volumes\n(NPM, Portainer, Kuma, Homarr)"]
+            HDD_VOLS["Persistent App Volumes\n(Portainer, Kuma, Homarr)"]
             HDD_BACKUP["Compressed Backup Archives"]
         end
         

@@ -41,7 +41,7 @@ A core design principle of this homelab is **Storage Tiering**, which optimizes 
 - **Assigned Workloads**:
   - Jellyfin media library files (`/home/maruf/MyHDDStorage/Jellyfin` containing `Movies`, `Music`, `Photos`, `TV`).
   - Prometheus time-series metrics storage (`/home/maruf/MyHDDStorage/monitoring/prometheus`).
-  - Large persistent container volume stores (`Nginx Proxy Manager`, `Portainer`, `Uptime Kuma`, `Homarr`).
+  - Large persistent container volume stores (`Portainer`, `Uptime Kuma`, `Homarr`).
 
 ---
 
@@ -53,10 +53,10 @@ All homelab services are attached to a custom bridge network named `homelab`.
                     ┌─────────────────────────┐
                     │   Cloudflare Network    │
                     └────────────┬────────────┘
-                                 │ HTTPS (443)
+                                 │ Encrypted Tunnel
                                  ▼
                     ┌─────────────────────────┐
-                    │   Nginx Proxy Manager   │ (Port 80/443/8081)
+                    │ Cloudflare Tunnel Daemon│ (cloudflared container)
                     └────────────┬────────────┘
                                  │
                  ┌───────────────┴───────────────┐
@@ -74,7 +74,7 @@ All homelab services are attached to a custom bridge network named `homelab`.
 ### Network Characteristics:
 - **Subnet & Name**: `homelab` (External bridge network created via `docker network create homelab`).
 - **Internal DNS Resolution**: Containers can communicate securely using service names (e.g., `leantime` communicates with `db:3306` via container hostname).
-- **Host Port Exposure**: Specific web ports are exposed to `0.0.0.0` to support LAN access and local proxying through Nginx Proxy Manager / Cloudflare Tunnel.
+- **Inbound Access**: Ingress traffic is routed via Cloudflare Tunnels (`cloudflared`) directly into containers on the `homelab` network without exposing inbound host ports to the public internet.
 
 ---
 
@@ -91,6 +91,6 @@ The monitoring stack collects performance data from both host OS and container l
 
 ## 4. Reverse Proxy & Security Layer
 
-- **Cloudflare Proxy**: Hides host IP address, provides Web Application Firewall (WAF) protection, DDoS prevention, and TLS certificate termination.
-- **Nginx Proxy Manager**: Internal ingress gateway directing traffic to target containers over the `homelab` network.
+- **Cloudflare Tunnels (`cloudflared`)**: Establishes an outbound-only encrypted tunnel connection to Cloudflare. No open inbound ports (80/443) required on the host firewall.
+- **Cloudflare Edge Protection**: Provides Web Application Firewall (WAF) protection, DDoS prevention, Access policies (Zero Trust), and TLS certificate termination.
 - **Environment Isolation**: Production credentials (database passwords, secret keys) are injected at container startup via `.env` files.
