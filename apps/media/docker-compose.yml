@@ -1,0 +1,22 @@
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    restart: unless-stopped
+    ports:
+      - "${JELLYFIN_PORT:-8096}:8096"
+    environment:
+      TZ: ${TZ:-Asia/Dhaka}
+    volumes:
+      - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/jellyfin/config:/config
+      - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/jellyfin/cache:/cache
+      - ${JELLYFIN_MEDIA_DIR:-/home/maruf/MyHDDStorage/Jellyfin}/Movies:/media/Movies
+      - ${JELLYFIN_MEDIA_DIR:-/home/maruf/MyHDDStorage/Jellyfin}/Music:/media/Music
+      - ${JELLYFIN_MEDIA_DIR:-/home/maruf/MyHDDStorage/Jellyfin}/Photos:/media/Photos
+      - ${JELLYFIN_MEDIA_DIR:-/home/maruf/MyHDDStorage/Jellyfin}/TV:/media/TV
+    networks:
+      - homelab
+
+networks:
+  homelab:
+    external: true

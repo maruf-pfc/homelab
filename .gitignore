@@ -1,0 +1,42 @@
+# ==============================================================================
+# Homelab Git Ignore Rules
+# Protects sensitive credentials, environment secrets, and persistent state
+# ==============================================================================
+
+# Environment Secrets
+.env
+*.env
+!.env.example
+apps/*/.env
+
+# Local Persistent Volumes & Data
+volumes/*
+!volumes/.gitkeep
+data/
+db/
+*.db
+*.sqlite
+*.sqlite-journal
+
+# Storage & Mount References
+/MyHDDStorage/
+*.bak
+
+# SSL Certificates & Secrets
+*.crt
+*.key
+*.pem
+letsencrypt/
+certs/
+
+# Logs & Temporary Files
+*.log
+logs/
+tmp/
+.cache/
+
+# OS / Editor Specific Files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

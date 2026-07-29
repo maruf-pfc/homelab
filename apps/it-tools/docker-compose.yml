@@ -1,0 +1,16 @@
+services:
+  it-tools:
+    image: corentinth/it-tools:latest
+    container_name: it-tools
+
+    restart: unless-stopped
+
+    ports:
+      - "8091:80"
+
+    networks:
+      - homelab
+
+networks:
+  homelab:
+    external: true

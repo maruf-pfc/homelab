@@ -1,0 +1,27 @@
+services:
+  homarr:
+    image: ghcr.io/homarr-labs/homarr:latest
+    container_name: homarr
+    restart: unless-stopped
+    ports:
+      - "${HOMARR_PORT:-7575}:7575"
+    environment:
+      TZ: ${TZ:-Asia/Dhaka}
+    volumes:
+      - ${HDD_DATA_DIR:-/home/maruf/MyHDDStorage}/docker/volumes/homarr/appdata:/appdata
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - homelab
+
+  it-tools:
+    image: corentinth/it-tools:latest
+    container_name: it-tools
+    restart: unless-stopped
+    ports:
+      - "${IT_TOOLS_PORT:-8091}:80"
+    networks:
+      - homelab
+
+networks:
+  homelab:
+    external: true

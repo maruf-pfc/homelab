@@ -1,0 +1,44 @@
+services:
+  db:
+    image: mariadb:11
+    container_name: leantime-db
+    restart: unless-stopped
+
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: leantime
+      MYSQL_USER: leantime
+      MYSQL_PASSWORD: leantimepassword
+
+    volumes:
+      - /home/maruf/docker-homelab/volumes/leantime/mysql:/var/lib/mysql
+
+    networks:
+      - homelab
+
+  leantime:
+    image: leantime/leantime:latest
+    container_name: leantime
+    restart: unless-stopped
+
+    depends_on:
+      - db
+
+    ports:
+      - "8090:8080"
+
+    environment:
+      LEAN_DB_HOST: db
+      LEAN_DB_DATABASE: leantime
+      LEAN_DB_USER: leantime
+      LEAN_DB_PASSWORD: leantimepassword
+
+    volumes:
+      - /home/maruf/docker-homelab/volumes/leantime/config:/var/www/html/userfiles
+
+    networks:
+      - homelab
+
+networks:
+  homelab:
+    external: true
