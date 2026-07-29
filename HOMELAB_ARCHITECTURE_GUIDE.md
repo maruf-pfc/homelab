@@ -21,9 +21,8 @@ flowchart TD
         subgraph Net["Docker Network: homelab"]
             direction TB
             
-            subgraph Core["Core & Management"]
-                PRT["Portainer (Port 9000)"]
-                KUMA["Uptime Kuma (Port 3001)"]
+            subgraph Fin["Finance & Management"]
+                MAY["Maybe Finance + Postgres (Port 8092)"]
                 LEAN["Leantime + MariaDB (Port 8090)"]
             end
             
@@ -48,6 +47,7 @@ flowchart TD
     CF <==>|Encrypted Tunnel Connection| CFT
     CFT -->|Internal Route| DSH
     CFT -->|Internal Route| JEL
+    CFT -->|Internal Route| MAY
     CFT -->|Internal Route| LEAN
     CFT -->|Internal Route| GRAF
     CFT -->|Internal Route| PRT

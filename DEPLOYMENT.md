@@ -49,6 +49,9 @@ docker compose -f apps/core/docker-compose.yml up -d
 # Dashboard Services (Dashy, IT-Tools)
 docker compose -f apps/dashboard/docker-compose.yml up -d
 
+# Finance Stack (Maybe, PostgreSQL, Redis)
+docker compose -f apps/finance/docker-compose.yml up -d
+
 # Management Services (Leantime, MariaDB)
 docker compose -f apps/management/docker-compose.yml up -d
 

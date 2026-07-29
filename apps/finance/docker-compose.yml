@@ -1,0 +1,53 @@
+services:
+  maybe-db:
+    image: postgres:15-alpine
+    container_name: maybe-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${MAYBE_DB_USER:-maybe}
+      POSTGRES_PASSWORD: ${MAYBE_DB_PASSWORD:-maybe_db_password_change_me}
+      POSTGRES_DB: ${MAYBE_DB_NAME:-maybe_production}
+    volumes:
+      - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/maybe/postgres:/var/lib/postgresql/data
+    networks:
+      - homelab
+
+  maybe-redis:
+    image: redis:7-alpine
+    container_name: maybe-redis
+    restart: unless-stopped
+    volumes:
+      - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/maybe/redis:/data
+    networks:
+      - homelab
+
+  maybe:
+    image: ghcr.io/maybe-finance/maybe:latest
+    container_name: maybe
+    restart: unless-stopped
+    ports:
+      - "${MAYBE_PORT:-8092}:3000"
+    environment:
+      SELF_HOSTED: "true"
+      RAILS_ENV: "production"
+      FORCE_SSL: "false"
+      ASSUME_SSL: "false"
+      APP_URL: "http://192.168.1.75:8092"
+      DATABASE_URL: "postgres://${MAYBE_DB_USER:-maybe}:${MAYBE_DB_PASSWORD:-maybe_db_password_change_me}@maybe-db:5432/${MAYBE_DB_NAME:-maybe_production}"
+      REDIS_URL: "redis://maybe-redis:6379/0"
+      SECRET_KEY_BASE: "${MAYBE_SECRET_KEY_BASE:-9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f}"
+      DB_HOST: "maybe-db"
+      DB_PORT: "5432"
+      DB_USER: "${MAYBE_DB_USER:-maybe}"
+      DB_PASSWORD: "${MAYBE_DB_PASSWORD:-maybe_db_password_change_me}"
+    depends_on:
+      - maybe-db
+      - maybe-redis
+    volumes:
+      - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/maybe/storage:/rails/storage
+    networks:
+      - homelab
+
+networks:
+  homelab:
+    external: true

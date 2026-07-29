@@ -6,6 +6,7 @@
 include:
   - apps/core/docker-compose.yml
   - apps/dashboard/docker-compose.yml
+  - apps/finance/docker-compose.yml
   - apps/management/docker-compose.yml
   - apps/media/docker-compose.yml
   - apps/monitoring/docker-compose.yml

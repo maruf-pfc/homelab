@@ -31,6 +31,8 @@ All active services deployed within this repository:
 | **Uptime Kuma** | Core / Status | `3001` | SSD / HDD | `${HDD_DATA_DIR}/docker/volumes/uptime-kuma` | Real-time monitoring & status pages |
 | **Dashy** | Dashboard | `7575` | SSD | `${SSD_DATA_DIR}/dashy/conf.yml` | Feature-rich, highly customizable homelab dashboard |
 | **IT-Tools** | Utilities | `8091` | Stateless | N/A | Handy developer & sysadmin utilities web app |
+| **Maybe** | Finance | `8092` | SSD | `${SSD_DATA_DIR}/maybe/storage` | Personal finance, net worth & investment tracker |
+| **Maybe Postgres** | Database | Internal (`5432`) | SSD | `${SSD_DATA_DIR}/maybe/postgres` | PostgreSQL database backend for Maybe |
 | **Leantime** | Management | `8090` | SSD | `${SSD_DATA_DIR}/leantime/config` | Lean project management platform |
 | **Leantime MariaDB** | Database | Internal (`3306`) | SSD | `${SSD_DATA_DIR}/leantime/mysql` | Database backend for Leantime |
 | **Jellyfin** | Media | `8096` | SSD + HDD | Config: `${SSD_DATA_DIR}/jellyfin`<br>Media: `/home/maruf/MyHDDStorage/Jellyfin` | Self-hosted media streaming server |

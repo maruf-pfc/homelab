@@ -21,7 +21,12 @@ echo "[+] Destination: ${BACKUP_DIR}"
 # 1. Database Dumps
 if docker ps --format '{{.Names}}' | grep -Eq '^leantime-db$'; then
     echo "[+] Exporting MariaDB dump for Leantime..."
-    docker exec leantime-db mariadb-dump -u root -prootpassword --all-databases > "${BACKUP_DIR}/leantime_db_dump.sql" || echo "[!] Database dump warning."
+    docker exec leantime-db mariadb-dump -u root -prootpassword --all-databases > "${BACKUP_DIR}/leantime_db_dump.sql" || echo "[!] MariaDB dump warning."
+fi
+
+if docker ps --format '{{.Names}}' | grep -Eq '^maybe-db$'; then
+    echo "[+] Exporting PostgreSQL dump for Maybe Finance..."
+    docker exec maybe-db pg_dumpall -U maybe > "${BACKUP_DIR}/maybe_db_dump.sql" || echo "[!] PostgreSQL dump warning."
 fi
 
 # 2. Archive SSD Configurations & Volumes
