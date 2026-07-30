@@ -15,6 +15,7 @@ services:
   grafana:
     image: grafana/grafana-oss:latest
     container_name: grafana
+    user: "0:0"
     restart: unless-stopped
     depends_on:
       - prometheus
