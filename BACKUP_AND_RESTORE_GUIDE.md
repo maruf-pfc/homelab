@@ -1,129 +1,152 @@
-# 📦 Homelab Backup & Restoration Comprehensive Guide
+# 📦 Homelab Backup & Restoration Guide
 
-This guide provides step-by-step instructions on how to create, inspect, and restore backups for your entire homelab infrastructure, including databases, service configurations, and volume data.
-
----
-
-## 📌 Overview & Backup Architecture
-
-All homelab backups are managed dynamically via `./scripts/backup.sh`. 
-
-- **Primary Dedicated Backup Directory**: `/home/maruf/homelab/backups/`
-- **Secondary HDD Archive Target**: `/home/maruf/MyHDDStorage/backups/`
-- **Archive File Naming**: `homelab_backup_YYYYMMDD_HHMMSS.tar.gz`
-- **Automated Pruning**: Retains snapshots for **7 days** (older snapshots are auto-deleted).
-
-### 🛠️ Captured Data Components:
-1. **MariaDB SQL Dump (`leantime_db_dump.sql`)**: Full database export for Leantime (all 37 tables & tickets).
-2. **PostgreSQL SQL Dump (`maybe_db_dump.sql`)**: Full database dump for Maybe Finance.
-3. **SSD Configs & Volumes Archive (`ssd_homelab_configs.tar.gz`)**: Archives `.env`, compose files, `apps/`, and `/home/maruf/homelab/volumes/`.
-4. **HDD Persistent Volumes Archive (`hdd_service_volumes.tar.gz`)**: Archives `/home/maruf/MyHDDStorage/docker/volumes/` (`Portainer`, `Uptime Kuma`, `Jellyfin`).
+Complete procedures for creating, inspecting, and restoring homelab backups — covering databases, service configurations, and persistent volumes.
 
 ---
 
-## ⚡ How to Create a Backup
+## 📌 Backup Architecture
 
-To trigger a complete system snapshot at any time, run:
+All backups are managed by `./scripts/backup.sh`.
 
+| | Primary (SSD) | Mirror (HDD) |
+|---|---|---|
+| **Path** | `/home/maruf/homelab/backups/` | `/home/maruf/MyHDDStorage/backups/` |
+| **Format** | `homelab_backup_YYYYMMDD_HHMMSS.tar.gz` | Same |
+| **Retention** | **Latest 1 only** — older archives deleted on success | Same |
+| **Log** | `/home/maruf/homelab/backups/backup.log` | — |
+
+### What's captured in each snapshot:
+1. **`leantime_db_dump.sql`** — Full MariaDB export for Leantime (all 37 tables)
+2. **`maybe_db_dump.sql`** — Full PostgreSQL export for Maybe Finance
+3. **`ssd_homelab_configs.tar.gz`** — All compose files, `apps/`, `.env`, and `/home/maruf/homelab/volumes/`
+4. **`hdd_service_volumes.tar.gz`** — `/home/maruf/MyHDDStorage/docker/volumes/` (Portainer, Uptime Kuma, Jellyfin)
+
+---
+
+## ⚡ Creating a Backup
+
+### Manual (run anytime):
 ```bash
 cd /home/maruf/homelab
 ./scripts/backup.sh
 ```
 
-### Output Example:
-```text
-[+] Starting Homelab Backup at Thu Jul 30 17:35:24 2026
-[+] Destination: /home/maruf/MyHDDStorage/backups/backup_20260730_173524
+### Automated nightly cron (already installed — runs at 3:00 AM):
+```
+0 3 * * * /home/maruf/homelab/scripts/backup.sh >> /home/maruf/homelab/backups/backup.log 2>&1
+```
+
+Verify it's installed:
+```bash
+crontab -l
+```
+
+### Sample output:
+```
+[+] Starting Homelab Backup at Thu Jul 30 03:00:00 2026
+[+] Destination: /home/maruf/homelab/backups/tmp_backup_20260730_030000
 [+] Exporting MariaDB dump for Leantime...
 [+] Exporting PostgreSQL dump for Maybe Finance...
 [+] Archiving SSD configurations, .env, and volumes...
 [+] Archiving HDD persistent service volumes...
 [+] Creating master backup archive...
-[✓] Backup completed successfully: /home/maruf/MyHDDStorage/backups/homelab_backup_20260730_173524.tar.gz
-[+] Pruning backups older than 7 days...
-[✓] All backup tasks finished!
+[✓] Backup completed successfully: /home/maruf/homelab/backups/homelab_backup_20260730_030000.tar.gz
+[+] Mirroring to HDD...
+[+] Removing old backups (keeping only latest)...
+[✓] All backup tasks finished at Thu Jul 30 03:14:22 2026
 ```
 
 ---
 
-## 🔄 How to Restore from a Backup
+## 🔄 Restoring from a Backup
 
-### Method A: Automated Restoration Helper (`./scripts/restore.sh`)
-
-To restore from the latest snapshot automatically:
+### Method A: Automated (recommended)
 ```bash
-cd /home/maruf/homelab
+# Restore from latest snapshot
 ./scripts/restore.sh
-```
 
-To restore from a specific archive:
-```bash
-./scripts/restore.sh /home/maruf/MyHDDStorage/backups/homelab_backup_20260730_173524.tar.gz
+# Or restore from a specific archive
+./scripts/restore.sh /home/maruf/MyHDDStorage/backups/homelab_backup_20260730_030000.tar.gz
 ```
 
 ---
 
-### Method B: Manual Restoration (Step-by-Step)
+### Method B: Manual Restoration
 
-If you prefer to restore specific services (e.g. only Leantime or only Maybe Finance):
-
-#### 1. Extract the Master Archive
+#### Step 1 — Extract the archive
 ```bash
-# Create a temporary extraction folder
 mkdir -p /tmp/homelab_restore
-tar -zxvf /home/maruf/MyHDDStorage/backups/homelab_backup_20260730_173524.tar.gz -C /tmp/homelab_restore
-
-# Change into the extracted folder
-cd /tmp/homelab_restore/backup_20260730_173524
+tar -zxvf /home/maruf/homelab/backups/homelab_backup_YYYYMMDD_HHMMSS.tar.gz \
+    -C /tmp/homelab_restore
+cd /tmp/homelab_restore/backup_YYYYMMDD_HHMMSS
 ```
 
-#### 2. Restore Leantime MariaDB Database (`leantime_db_dump.sql`)
+#### Step 2 — Restore Leantime (MariaDB)
 ```bash
-# Extract the leantime table statements
-python3 -c "
-with open('leantime_db_dump.sql', 'r') as f:
-    lines = f.readlines()
-clean = [l for l in lines if not l.startswith('CREATE DATABASE') and not l.startswith('USE `mysql`')]
-with open('/tmp/leantime_clean.sql', 'w') as f:
-    f.writelines(clean)
-"
+source /home/maruf/homelab/.env
 
-# Import into leantime-db container
-docker exec -i leantime-db mariadb -u leantime -pleantimepassword leantime < /tmp/leantime_clean.sql
+# Clean the dump (remove any system-level CREATE DATABASE statements)
+grep -v "^CREATE DATABASE\|^USE \`mysql\`" leantime_db_dump.sql > /tmp/leantime_clean.sql
 
-# Restart Leantime
+# Import into running container
+docker exec -i leantime-db mariadb \
+  -u "${LEANTIME_DB_USER}" \
+  -p"${LEANTIME_DB_PASSWORD}" \
+  "${LEANTIME_DB_NAME}" < /tmp/leantime_clean.sql
+
 docker restart leantime
 ```
 
-#### 3. Restore Maybe Finance PostgreSQL Database (`maybe_db_dump.sql`)
+#### Step 3 — Restore Maybe Finance (PostgreSQL)
 ```bash
-docker exec -i maybe-db psql -U maybe -d maybe_production < maybe_db_dump.sql
+source /home/maruf/homelab/.env
+
+docker exec -i maybe-db psql \
+  -U "${MAYBE_DB_USER}" \
+  -d "${MAYBE_DB_NAME}" < maybe_db_dump.sql
+
 docker restart maybe
 ```
 
-#### 4. Restore HDD Persistent Service Volumes (`hdd_service_volumes.tar.gz`)
+#### Step 4 — Restore HDD service volumes (Portainer, Uptime Kuma, Jellyfin)
 ```bash
-# Stop HDD containers
 docker stop portainer uptime-kuma jellyfin
 
-# Extract HDD volumes to MyHDDStorage
-docker run --rm -v /home/maruf/MyHDDStorage/docker/volumes:/dst -v $(pwd):/src alpine sh -c "tar -zxvf /src/hdd_service_volumes.tar.gz -C /dst"
+docker run --rm \
+  -v /home/maruf/MyHDDStorage/docker/volumes:/dst \
+  -v $(pwd):/src \
+  alpine sh -c "tar -zxvf /src/hdd_service_volumes.tar.gz -C /dst"
 
-# Restart containers
+./scripts/deploy.sh
+```
+
+#### Step 5 — Restore SSD configs & volumes
+```bash
+docker stop leantime leantime-db maybe maybe-db maybe-redis grafana
+
+tar -zxvf ssd_homelab_configs.tar.gz -C /home/maruf/homelab/
+
 ./scripts/deploy.sh
 ```
 
 ---
 
-## ⏰ Automated Daily Backup via Cron
+## 🗂️ Backup Directory Structure
 
-To automatically take a backup every night at 3:00 AM:
+```
+/home/maruf/homelab/backups/
+├── homelab_backup_20260730_030000.tar.gz   ← Latest snapshot (only one kept)
+├── backup.log                               ← Cron run history
+└── README.md                                ← This directory's notes
+```
 
-1. Open crontab:
-   ```bash
-   crontab -e
-   ```
-2. Add the following line:
-   ```cron
-   0 3 * * * /home/maruf/homelab/scripts/backup.sh > /dev/null 2>&1
-   ```
+> Only **one archive** is kept at any time. The previous backup is deleted after each successful run to conserve disk space.
+
+---
+
+## ⚠️ Important Notes
+
+- **`.env` is included in the backup** — store backup archives securely (not in a public location).
+- **DB passwords must match** between `.env` and the live DB. If you restore `.env` from backup, re-apply any passwords that were changed after the backup was taken.
+- **Backup archives are gitignored** — they will never be accidentally committed to git.
+- After restoring volumes, always run `./scripts/deploy.sh` to recreate containers with correct mount paths.
