@@ -55,11 +55,12 @@ fi
 
 echo "[✓] Backup completed successfully: ${MASTER_TAR}"
 
-# 5. Retention Policy: Prune backups older than 7 days
-echo "[+] Pruning backups older than 7 days..."
-find "${BACKUP_PARENT_DIR}" -name "homelab_backup_*.tar.gz" -mtime +7 -delete || true
+# 5. Retention Policy: Keep only the most recent backup (remove all older ones)
+echo "[+] Removing old backups (keeping only latest)..."
+find "${BACKUP_PARENT_DIR}" -name "homelab_backup_*.tar.gz" ! -newer "${MASTER_TAR}" -not -samefile "${MASTER_TAR}" -delete 2>/dev/null || true
+find "${BACKUP_PARENT_DIR}" -name "backup_*" -maxdepth 1 -type d -exec rm -rf {} + 2>/dev/null || true
 if [ -d "${HDD_BACKUP_DIR}" ]; then
-    find "${HDD_BACKUP_DIR}" -name "homelab_backup_*.tar.gz" -mtime +7 -delete || true
+    find "${HDD_BACKUP_DIR}" -name "homelab_backup_*.tar.gz" ! -newer "${MASTER_TAR}" -not -samefile "${MASTER_TAR}" -delete 2>/dev/null || true
 fi
 
 echo "[✓] All backup tasks finished at $(date)"
