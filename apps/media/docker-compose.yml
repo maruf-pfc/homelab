@@ -8,7 +8,10 @@ services:
     volumes:
       - ${HDD_DATA_DIR:-/home/maruf/MyHDDStorage}/docker/volumes/jellyfin/config:/config
       - ${HDD_DATA_DIR:-/home/maruf/MyHDDStorage}/docker/volumes/jellyfin/cache:/cache
-      - ${JELLYFIN_MEDIA_DIR:-/home/maruf/MyHDDStorage/Jellyfin}:/media
+      - ${HDD_DATA_DIR:-/home/maruf/MyHDDStorage}/Jellyfin/Movies:/media/Movies
+      - ${HDD_DATA_DIR:-/home/maruf/MyHDDStorage}/Jellyfin/TV:/media/TV
+      - ${HDD_DATA_DIR:-/home/maruf/MyHDDStorage}/Jellyfin/Music:/media/Music
+      - ${HDD_DATA_DIR:-/home/maruf/MyHDDStorage}/Videos:/media/Videos
     networks:
       - homelab
 
