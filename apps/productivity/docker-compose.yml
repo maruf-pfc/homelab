@@ -11,8 +11,8 @@ services:
     volumes:
       - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/leantime/mysql:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
-      start_period: 10s
+      test: ["CMD-SHELL", "mariadb-admin ping -u root --password=\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      start_period: 30s
       interval: 15s
       timeout: 5s
       retries: 5
