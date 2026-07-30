@@ -31,13 +31,13 @@ fi
 
 # 2. Archive SSD Configurations & Volumes
 echo "[+] Archiving SSD configurations, .env, and volumes..."
-tar -czf "${BACKUP_DIR}/ssd_homelab_configs.tar.gz" -C "${ROOT_DIR}" .env configs volumes apps docker-compose.yml || true
+docker run --rm -v "${ROOT_DIR}:/src" -v "${BACKUP_DIR}:/dst" alpine sh -c "tar -czf /dst/ssd_homelab_configs.tar.gz -C /src .env configs volumes apps docker-compose.yml" 2>/dev/null || true
 
-# 3. Archive HDD Volumes (Nginx Proxy Manager, Portainer, Uptime Kuma, Homarr)
+# 3. Archive HDD Volumes (Portainer, Uptime Kuma, Jellyfin)
 HDD_VOLUMES="/home/maruf/MyHDDStorage/docker/volumes"
 if [ -d "${HDD_VOLUMES}" ]; then
     echo "[+] Archiving HDD persistent service volumes..."
-    tar -czf "${BACKUP_DIR}/hdd_service_volumes.tar.gz" -C "${HDD_VOLUMES}" . || true
+    docker run --rm -v "${HDD_VOLUMES}:/src" -v "${BACKUP_DIR}:/dst" alpine sh -c "tar -czf /dst/hdd_service_volumes.tar.gz -C /src ." 2>/dev/null || true
 fi
 
 # 4. Create Master Consolidated Tarball

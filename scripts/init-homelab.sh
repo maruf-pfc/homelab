@@ -33,5 +33,6 @@ fi
 echo "[+] Checking volume directories..."
 mkdir -p "${ROOT_DIR}/volumes"
 
-echo "[✓] Initialization completed successfully!"
-echo "    Run 'docker compose config' to test your modular configuration."
+# 4. Trigger Master Category Deployer
+echo "[+] Launching Master Orchestrator (scripts/deploy.sh)..."
+bash "${SCRIPT_DIR}/deploy.sh"
