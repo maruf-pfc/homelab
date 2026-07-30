@@ -35,6 +35,17 @@ logs/
 tmp/
 .cache/
 
+# Backup Archives & Temporary Dumps
+backups/*
+!backups/.gitkeep
+!backups/README.md
+backup_*
+/backup_*
+backup_20260729_173118
+/backup_20260729_173118
+*.sql
+*.tar.gz
+
 # OS / Editor Specific Files
 .DS_Store
 Thumbs.db

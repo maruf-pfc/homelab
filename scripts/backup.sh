@@ -10,10 +10,13 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-BACKUP_PARENT_DIR="/home/maruf/MyHDDStorage/backups"
+BACKUP_PARENT_DIR="${ROOT_DIR}/backups"
+HDD_BACKUP_DIR="/home/maruf/MyHDDStorage/backups"
 BACKUP_DIR="${BACKUP_PARENT_DIR}/backup_${TIMESTAMP}"
 
+mkdir -p "${BACKUP_PARENT_DIR}"
 mkdir -p "${BACKUP_DIR}"
+[ -d "${HDD_BACKUP_DIR}" ] || mkdir -p "${HDD_BACKUP_DIR}"
 
 echo "[+] Starting Homelab Backup at $(date)"
 echo "[+] Destination: ${BACKUP_DIR}"
@@ -46,10 +49,17 @@ MASTER_TAR="${BACKUP_PARENT_DIR}/homelab_backup_${TIMESTAMP}.tar.gz"
 tar -czf "${MASTER_TAR}" -C "${BACKUP_PARENT_DIR}" "backup_${TIMESTAMP}"
 rm -rf "${BACKUP_DIR}"
 
+if [ -d "${HDD_BACKUP_DIR}" ]; then
+    cp -af "${MASTER_TAR}" "${HDD_BACKUP_DIR}/"
+fi
+
 echo "[✓] Backup completed successfully: ${MASTER_TAR}"
 
 # 5. Retention Policy: Prune backups older than 7 days
 echo "[+] Pruning backups older than 7 days..."
 find "${BACKUP_PARENT_DIR}" -name "homelab_backup_*.tar.gz" -mtime +7 -delete || true
+if [ -d "${HDD_BACKUP_DIR}" ]; then
+    find "${HDD_BACKUP_DIR}" -name "homelab_backup_*.tar.gz" -mtime +7 -delete || true
+fi
 
 echo "[✓] All backup tasks finished at $(date)"

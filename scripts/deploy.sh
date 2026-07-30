@@ -140,12 +140,16 @@ if [ "${ENABLE_PROMETHEUS}" = "true" ] || [ "${ENABLE_GRAFANA}" = "true" ]; then
     run_stack_service "${ROOT_DIR}/apps/monitoring/docker-compose.yml" prometheus grafana node-exporter cadvisor
 fi
 
-# 10. Category 8: Productivity Stack (SSD Storage for Leantime + MariaDB)
+# 10. Category 8: Productivity Stack (SSD Storage for Leantime + MariaDB, ChangeDetection)
 echo -e "${CYAN}[+] Processing Category 8: Productivity Stack (apps/productivity)...${NC}"
-if [ "${ENABLE_LEANTIME}" = "true" ]; then
+PROD_SERVICES=()
+[ "${ENABLE_LEANTIME:-false}" = "true" ] && PROD_SERVICES+=(leantime-db leantime)
+[ "${ENABLE_CHANGEDETECTION:-false}" = "true" ] && PROD_SERVICES+=(changedetection)
+if [ ${#PROD_SERVICES[@]} -gt 0 ]; then
     mkdir -p "${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/leantime/config"
     mkdir -p "${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/leantime/mysql"
-    run_stack_service "${ROOT_DIR}/apps/productivity/docker-compose.yml" leantime-db leantime
+    mkdir -p "${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/changedetection"
+    run_stack_service "${ROOT_DIR}/apps/productivity/docker-compose.yml" "${PROD_SERVICES[@]}"
 fi
 
 # 11. Category 10: Sysadmin Stack (HDD Storage for Portainer & Uptime Kuma)
@@ -183,6 +187,7 @@ print_service_status "Dashy (SSD)" "${ENABLE_DASHY}" "${DASHBOARD_PORT:-7575}" "
 print_service_status "IT-Tools (SSD)" "${ENABLE_IT_TOOLS}" "${IT_TOOLS_PORT:-8091}" "http://192.168.1.75:8091"
 print_service_status "Maybe Finance (SSD)" "${ENABLE_MAYBE}" "${MAYBE_PORT:-8092}" "https://finance.baaankai.dpdns.org"
 print_service_status "Leantime (SSD)" "${ENABLE_LEANTIME}" "${LEANTIME_PORT:-8090}" "http://192.168.1.75:8090"
+print_service_status "ChangeDetection (SSD)" "${ENABLE_CHANGEDETECTION:-true}" "${CHANGEDETECTION_PORT:-5001}" "http://192.168.1.75:5001"
 print_service_status "Jellyfin (HDD)" "${ENABLE_JELLYFIN}" "${JELLYFIN_PORT:-8096}" "http://192.168.1.75:8096"
 print_service_status "Prometheus (SSD)" "${ENABLE_PROMETHEUS}" "${PROMETHEUS_PORT:-9093}" "http://192.168.1.75:9093"
 print_service_status "Grafana (SSD)" "${ENABLE_GRAFANA}" "${GRAFANA_PORT:-3005}" "http://192.168.1.75:3005"
