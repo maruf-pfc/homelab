@@ -1,6 +1,6 @@
 # 🚀 Homelab Operations & Deployment Runbook
 
-This runbook provides step-by-step procedures for managing, deploying, backing up, and restoring services in your homelab.
+This runbook provides step-by-step procedures for managing, deploying, backing up, and restoring services in your homelab across 12 modular categories.
 
 ---
 
@@ -19,118 +19,93 @@ This runbook provides step-by-step procedures for managing, deploying, backing u
 ### First-Time Initialization
 1. Clone the repository into `/home/maruf/homelab`:
    ```bash
-   git clone https://github.com/your-username/homelab.git /home/maruf/homelab
+   git clone https://github.com/maruf-pfc/homelab.git /home/maruf/homelab
    cd /home/maruf/homelab
    ```
 2. Execute initialization script:
    ```bash
    ./scripts/init-homelab.sh
    ```
-3. Configure environment variables in `.env`:
+3. Configure environment variables and feature toggles in `.env`:
    ```bash
    nano .env
    ```
 
 ---
 
-## 2. Managing Applications
+## 2. Managing Applications via Feature Toggle Engine
 
-### Starting All Services
+### Master Category Deployment
+To deploy all enabled applications (`ENABLE_<SERVICE>=true` in `.env`):
 ```bash
 cd /home/maruf/homelab
-docker compose up -d
+./scripts/deploy.sh
 ```
 
-### Starting a Specific Stack
+### Starting a Specific Category Stack Directly
 ```bash
-# Core Services (NPM, Portainer, Uptime Kuma)
-docker compose -f apps/core/docker-compose.yml up -d
+# Category 1: Media Stack (Jellyfin, Sonarr, Radarr)
+docker compose -f apps/media/docker-compose.yml up -d jellyfin
 
-# Dashboard Services (Dashy, IT-Tools)
-docker compose -f apps/dashboard/docker-compose.yml up -d
+# Category 2: Finance Stack (Maybe Finance, PostgreSQL, Redis)
+docker compose -f apps/finance/docker-compose.yml up -d maybe-db maybe-redis maybe
 
-# Finance Stack (Maybe, PostgreSQL, Redis)
-docker compose -f apps/finance/docker-compose.yml up -d
+# Category 3: Dashboards Stack (Dashy, Homepage, Glance)
+docker compose -f apps/dashboards/docker-compose.yml up -d dashy
 
-# Management Services (Leantime, MariaDB)
-docker compose -f apps/management/docker-compose.yml up -d
+# Category 4: Network & Ingress (Cloudflare Tunnel cloudflared)
+docker compose -f apps/network/docker-compose.yml up -d cloudflared
 
-# Media Server (Jellyfin)
-docker compose -f apps/media/docker-compose.yml up -d
+# Category 5: Monitoring Stack (Prometheus, Grafana, Node-Exporter, cAdvisor)
+docker compose -f apps/monitoring/docker-compose.yml up -d prometheus grafana node-exporter cadvisor
 
-# Monitoring Stack (Prometheus, Grafana, Node-Exporter, cAdvisor)
-docker compose -f apps/monitoring/docker-compose.yml up -d
+# Category 8: Productivity Stack (Leantime, MariaDB, Stirling-PDF, Memos)
+docker compose -f apps/productivity/docker-compose.yml up -d leantime-db leantime
+
+# Category 10: Sysadmin Stack (Portainer, Uptime Kuma, IT-Tools)
+docker compose -f apps/sysadmin/docker-compose.yml up -d portainer uptime-kuma it-tools
 ```
 
 ### Checking Container Health
 ```bash
-docker compose ps
+docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 ```
 
 ### Viewing Real-Time Logs
 ```bash
-# All containers
-docker compose logs -f
+# View Cloudflare Tunnel daemon logs
+docker logs cloudflared --tail=50 -f
 
-# Specific container
-docker compose logs -f jellyfin
+# View Leantime logs
+docker logs leantime --tail=50 -f
+
+# View Maybe Finance logs
+docker logs maybe --tail=50 -f
 ```
 
 ---
 
-## 3. Upgrading Services
+## 3. Automated Backup & Recovery
 
-To safely pull latest images and update running containers:
-
+### Executing Full System Backup
+Create an automated snapshot of all database dumps and volume files:
 ```bash
-cd /home/maruf/homelab
-
-# Pull updated images for all stacks
-docker compose pull
-
-# Recreate updated containers without downtime for unchanged services
-docker compose up -d --remove-orphans
-
-# Clean up unused image layers
-docker image prune -f
+./scripts/backup.sh
 ```
+- **Output location**: `/home/maruf/MyHDDStorage/backups/homelab_backup_YYYYMMDD_HHMMSS.tar.gz`
+- **Retention**: Automatically prunes snapshots older than 7 days.
 
 ---
 
-## 4. Removing Legacy File Browser
+## 4. Troubleshooting & Maintenance
 
-If File Browser container is still running from a previous installation, safely remove it:
-
+### Clearing Cloudflare Tunnel Connectivity
+If Cloudflare returns Error 1033:
 ```bash
-./scripts/remove-filebrowser.sh
+docker restart cloudflared
+docker logs cloudflared --tail=30
 ```
 
----
-
-## 5. Backup & Disaster Recovery
-
-### Data Directories to Backup
-- **SSD Configs & DBs**: `/home/maruf/homelab/volumes`
-- **HDD Proxy & App Data**: `/home/maruf/MyHDDStorage/docker/volumes`
-- **Prometheus Data**: `/home/maruf/MyHDDStorage/monitoring/prometheus`
-
-### Performing Manual Backup
-```bash
-TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-BACKUP_DIR="/home/maruf/MyHDDStorage/backups/${TIMESTAMP}"
-mkdir -p "${BACKUP_DIR}"
-
-echo "[+] Backing up SSD volume configurations..."
-tar -czf "${BACKUP_DIR}/ssd_volumes.tar.gz" -C /home/maruf/homelab volumes .env
-
-echo "[+] Backing up Nginx Proxy Manager & Portainer data..."
-tar -czf "${BACKUP_DIR}/hdd_volumes.tar.gz" -C /home/maruf/MyHDDStorage/docker/volumes .
-
-echo "[✓] Backup completed at ${BACKUP_DIR}"
-```
-
-### Restoring from Backup
-1. Stop running containers: `docker compose down`
-2. Extract config tarball to `/home/maruf/homelab`
-3. Extract HDD data tarball to `/home/maruf/MyHDDStorage/docker/volumes`
-4. Start containers: `docker compose up -d`
+### Storage Audit Rules
+- **HDD Storage (`/home/maruf/MyHDDStorage`)**: Reserved for `Jellyfin`, `Portainer`, `Uptime Kuma`, and bulk media downloads.
+- **SSD Storage (`/home/maruf/homelab/volumes`)**: Reserved for `Leantime MariaDB`, `Maybe Postgres & Redis`, `Dashy`, `Grafana`, and fast database workloads.
