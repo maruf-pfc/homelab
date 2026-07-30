@@ -1,12 +1,18 @@
 # ==============================================================================
-# Homelab Orchestration - Master Docker Compose File
-# Uses Docker Compose 'include' directive to manage modular application stacks.
+# Homelab Orchestration - Master Category-Wise Docker Compose File
+# Uses Docker Compose 'include' directive to map all 12 modular app stacks.
 # ==============================================================================
 
 include:
-  - apps/core/docker-compose.yml
-  - apps/dashboard/docker-compose.yml
-  - apps/finance/docker-compose.yml
-  - apps/management/docker-compose.yml
   - apps/media/docker-compose.yml
+  - apps/finance/docker-compose.yml
+  - apps/dashboards/docker-compose.yml
+  - apps/network/docker-compose.yml
   - apps/monitoring/docker-compose.yml
+  - apps/storage/docker-compose.yml
+  - apps/security/docker-compose.yml
+  - apps/productivity/docker-compose.yml
+  - apps/automation/docker-compose.yml
+  - apps/sysadmin/docker-compose.yml
+  - apps/ai/docker-compose.yml
+  - apps/workflows/docker-compose.yml

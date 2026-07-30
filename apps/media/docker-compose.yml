@@ -5,15 +5,178 @@ services:
     restart: unless-stopped
     ports:
       - "${JELLYFIN_PORT:-8096}:8096"
+    volumes:
+      - ${HDD_DATA_DIR:-/home/maruf/MyHDDStorage}/docker/volumes/jellyfin/config:/config
+      - ${HDD_DATA_DIR:-/home/maruf/MyHDDStorage}/docker/volumes/jellyfin/cache:/cache
+      - ${JELLYFIN_MEDIA_DIR:-/home/maruf/MyHDDStorage/Jellyfin}:/media
+    networks:
+      - homelab
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    restart: unless-stopped
+    ports:
+      - "${SONARR_PORT:-8989}:8989"
     environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
       TZ: ${TZ:-Asia/Dhaka}
     volumes:
-      - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/jellyfin/config:/config
-      - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/jellyfin/cache:/cache
-      - ${JELLYFIN_MEDIA_DIR:-/home/maruf/MyHDDStorage/Jellyfin}/Movies:/media/Movies
-      - ${JELLYFIN_MEDIA_DIR:-/home/maruf/MyHDDStorage/Jellyfin}/Music:/media/Music
-      - ${JELLYFIN_MEDIA_DIR:-/home/maruf/MyHDDStorage/Jellyfin}/Photos:/media/Photos
-      - ${JELLYFIN_MEDIA_DIR:-/home/maruf/MyHDDStorage/Jellyfin}/TV:/media/TV
+      - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/sonarr:/config
+      - ${HDD_DATA_DIR:-/home/maruf/MyHDDStorage}/TV:/tv
+      - ${HDD_DATA_DIR:-/home/maruf/MyHDDStorage}/downloads:/downloads
+    networks:
+      - homelab
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    restart: unless-stopped
+    ports:
+      - "${RADARR_PORT:-7878}:7878"
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-Asia/Dhaka}
+    volumes:
+      - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/radarr:/config
+      - ${HDD_DATA_DIR:-/home/maruf/MyHDDStorage}/Movies:/movies
+      - ${HDD_DATA_DIR:-/home/maruf/MyHDDStorage}/downloads:/downloads
+    networks:
+      - homelab
+
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:latest
+    container_name: lidarr
+    restart: unless-stopped
+    ports:
+      - "${LIDARR_PORT:-8686}:8686"
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-Asia/Dhaka}
+    volumes:
+      - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/lidarr:/config
+      - ${HDD_DATA_DIR:-/home/maruf/MyHDDStorage}/Music:/music
+      - ${HDD_DATA_DIR:-/home/maruf/MyHDDStorage}/downloads:/downloads
+    networks:
+      - homelab
+
+  readarr:
+    image: lscr.io/linuxserver/readarr:develop
+    container_name: readarr
+    restart: unless-stopped
+    ports:
+      - "${READARR_PORT:-8787}:8787"
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-Asia/Dhaka}
+    volumes:
+      - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/readarr:/config
+      - ${HDD_DATA_DIR:-/home/maruf/MyHDDStorage}/Books:/books
+      - ${HDD_DATA_DIR:-/home/maruf/MyHDDStorage}/downloads:/downloads
+    networks:
+      - homelab
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    restart: unless-stopped
+    ports:
+      - "${PROWLARR_PORT:-9696}:9696"
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-Asia/Dhaka}
+    volumes:
+      - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/prowlarr:/config
+    networks:
+      - homelab
+
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    restart: unless-stopped
+    ports:
+      - "${BAZARR_PORT:-6767}:6767"
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-Asia/Dhaka}
+    volumes:
+      - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/bazarr:/config
+      - ${HDD_DATA_DIR:-/home/maruf/MyHDDStorage}/Movies:/movies
+      - ${HDD_DATA_DIR:-/home/maruf/MyHDDStorage}/TV:/tv
+    networks:
+      - homelab
+
+  navidrome:
+    image: deluan/navidrome:latest
+    container_name: navidrome
+    restart: unless-stopped
+    ports:
+      - "${NAVIDROME_PORT:-4533}:4533"
+    environment:
+      ND_SCANSCHEDULE: 1h
+      ND_LOGLEVEL: info
+    volumes:
+      - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/navidrome:/data
+      - ${HDD_DATA_DIR:-/home/maruf/MyHDDStorage}/Music:/music:ro
+    networks:
+      - homelab
+
+  audiobookshelf:
+    image: ghcr.io/advplyr/audiobookshelf:latest
+    container_name: audiobookshelf
+    restart: unless-stopped
+    ports:
+      - "${AUDIOBOOKSHELF_PORT:-13378}:80"
+    volumes:
+      - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/audiobookshelf/config:/config
+      - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/audiobookshelf/metadata:/metadata
+      - ${HDD_DATA_DIR:-/home/maruf/MyHDDStorage}/Audiobooks:/audiobooks
+    networks:
+      - homelab
+
+  kavita:
+    image: kavitareader/kavita:latest
+    container_name: kavita
+    restart: unless-stopped
+    ports:
+      - "${KAVITA_PORT:-5003}:5000"
+    volumes:
+      - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/kavita:/kavita/config
+      - ${HDD_DATA_DIR:-/home/maruf/MyHDDStorage}/Comics:/comics
+    networks:
+      - homelab
+
+  komga:
+    image: gotson/komga:latest
+    container_name: komga
+    restart: unless-stopped
+    ports:
+      - "${KOMGA_PORT:-8084}:8080"
+    volumes:
+      - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/komga:/config
+      - ${HDD_DATA_DIR:-/home/maruf/MyHDDStorage}/Comics:/comics
+    networks:
+      - homelab
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    restart: unless-stopped
+    ports:
+      - "${QBITTORRENT_PORT:-8087}:8080"
+      - "6881:6881"
+      - "6881:6881/udp"
+    environment:
+      WEBUI_PORT: 8080
+    volumes:
+      - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/qbittorrent:/config
+      - ${HDD_DATA_DIR:-/home/maruf/MyHDDStorage}/downloads:/downloads
     networks:
       - homelab
 
