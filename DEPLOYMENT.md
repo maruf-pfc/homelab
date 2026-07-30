@@ -70,8 +70,10 @@ docker compose --env-file .env -f apps/finance/docker-compose.yml up -d maybe-db
 # Category 3: Dashboards
 docker compose --env-file .env -f apps/dashboards/docker-compose.yml up -d dashy
 
-# Category 4: Network & Ingress
-docker compose --env-file .env -f apps/network/docker-compose.yml up -d cloudflared
+# Category 4: Cloudflare Tunnel (host systemd daemon — NOT Docker)
+sudo systemctl status cloudflared
+sudo systemctl restart cloudflared
+journalctl -u cloudflared -f --no-pager
 
 # Category 5: Monitoring
 docker compose --env-file .env -f apps/monitoring/docker-compose.yml up -d prometheus grafana node-exporter cadvisor
@@ -190,11 +192,18 @@ docker exec leantime-db mariadb -u root -p'<old_root_password>' \
 docker compose --env-file .env -f apps/productivity/docker-compose.yml up -d --force-recreate leantime
 ```
 
-### Cloudflare Tunnel Error 1033 (no route)
+### Cloudflare Tunnel offline (Error 1033 / services unreachable)
 ```bash
-docker restart cloudflared
-docker logs cloudflared --tail=30
+# Check if the host daemon is running
+sudo systemctl status cloudflared
+
+# Restart it
+sudo systemctl restart cloudflared
+
+# View live logs
+journalctl -u cloudflared -f --no-pager
 ```
+> The tunnel runs as a **host systemd service**, not a Docker container. It is managed at https://one.dash.cloudflare.com
 
 ### Port already in use on deploy
 Edit `.env` and change the conflicting `_PORT` variable to a free port, then redeploy.

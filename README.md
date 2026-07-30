@@ -21,7 +21,7 @@ Production-grade, category-wise modular, self-hosted homelab infrastructure opti
 - **🎛️ Category-Wise Feature Toggle System**:
   - Master feature flags (`ENABLE_<SERVICE>=true/false`) in `.env` control deployment across 12 distinct category compose files under `apps/`.
 - **🌐 Cloudflare Zero Trust Ingress**:
-  - All external traffic routes via outbound-only Cloudflare Tunnels (`cloudflared`) — no open inbound firewall ports. Tunnel token managed securely in `.env`.
+  - All external traffic routes via outbound-only Cloudflare Tunnels. `cloudflared` runs as a **host systemd service** (`/usr/local/bin/cloudflared`) managed from the [Cloudflare dashboard](https://one.dash.cloudflare.com) — completely independent of Docker.
 - **📊 Comprehensive Monitoring**:
   - Full observability pipeline: Prometheus → Grafana, Node Exporter (host metrics), cAdvisor (container metrics).
 - **🗄️ DB Healthchecks & Startup Ordering**:
@@ -35,7 +35,7 @@ Production-grade, category-wise modular, self-hosted homelab infrastructure opti
 
 | Service | Category | Host Port | Storage | Description |
 | :--- | :--- | :---: | :---: | :--- |
-| **Cloudflare Tunnel** | 4: Network | Outbound only | — | Zero Trust encrypted tunnel |
+| **Cloudflare Tunnel** | 4: Network | Outbound only | Host daemon | Systemd service — managed via Cloudflare dashboard |
 | **Portainer** | 10: Sysadmin | `9000`, `9443` | HDD | Docker stack & container management |
 | **IT-Tools** | 10: Sysadmin | `8091` | Stateless | Developer & sysadmin utilities |
 | **Dashy** | 3: Dashboards | `7575` | SSD | Homelab dashboard & service portal |

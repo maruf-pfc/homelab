@@ -1,13 +1,21 @@
-services:
-  cloudflared:
-    image: cloudflare/cloudflared:latest
-    container_name: cloudflared
-    restart: unless-stopped
-    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
-    networks:
-      - homelab
+# ============================================================
+# Category 4: Network & Ingress
+#
+# NOTE: Cloudflare Tunnel is NOT managed here as a container.
+# It is installed directly on the host as a system daemon:
+#   /usr/local/bin/cloudflared (v2025.7.0)
+#
+# The tunnel is configured and managed via the Cloudflare
+# dashboard at: https://one.dash.cloudflare.com
+#
+# To check tunnel status on the host:
+#   systemctl status cloudflared
+#   journalctl -u cloudflared -f
+# ============================================================
 
-  # ── AdGuard Home (DNS Ad-Blocker) ──
+services:
+
+  # ── AdGuard Home (DNS Ad-Blocker) — disabled by default ──
   # adguard:
   #   image: adguard/adguardhome:latest
   #   container_name: adguard
@@ -19,18 +27,6 @@ services:
   #   volumes:
   #     - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/adguard/work:/opt/adguardhome/work
   #     - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/adguard/conf:/opt/adguardhome/conf
-  #   networks:
-  #     - homelab
-
-  # ── Headscale (Tailscale Control Plane) ──
-  # headscale:
-  #   image: headscale/headscale:latest
-  #   container_name: headscale
-  #   restart: unless-stopped
-  #   ports:
-  #     - "${HEADSCALE_PORT:-8080}:8080"
-  #   volumes:
-  #     - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/headscale:/etc/headscale
   #   networks:
   #     - homelab
 
