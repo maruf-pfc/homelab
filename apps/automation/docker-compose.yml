@@ -1,0 +1,10 @@
+# ============================================================
+# This stack is currently a placeholder. Uncomment services
+# and add corresponding ENABLE_* flags in .env to activate.
+# ============================================================
+
+services: {}
+
+networks:
+  homelab:
+    external: true

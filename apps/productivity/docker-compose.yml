@@ -10,6 +10,12 @@ services:
       MYSQL_PASSWORD: ${LEANTIME_DB_PASSWORD:-leantimepassword}
     volumes:
       - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/leantime/mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 10s
+      interval: 15s
+      timeout: 5s
+      retries: 5
     networks:
       - homelab
 
@@ -18,7 +24,8 @@ services:
     container_name: leantime
     restart: unless-stopped
     depends_on:
-      - leantime-db
+      leantime-db:
+        condition: service_healthy
     ports:
       - "${LEANTIME_PORT:-8090}:8080"
     environment:
@@ -71,7 +78,7 @@ services:
     ports:
       - "${VIKUNJA_PORT:-3456}:3456"
     environment:
-      VIKUNJA_SERVICE_JWTSECRET: "change_me_vikunja_jwt_secret_key"
+      VIKUNJA_SERVICE_JWTSECRET: "${VIKUNJA_JWT_SECRET:-change_me_vikunja_jwt_secret_key}"
     volumes:
       - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/vikunja:/app/vikunja/files
     networks:

@@ -9,6 +9,12 @@ services:
       POSTGRES_DB: ${MAYBE_DB_NAME:-maybe_production}
     volumes:
       - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/maybe/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${MAYBE_DB_USER:-maybe}"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - homelab
 
@@ -41,8 +47,10 @@ services:
       DB_USER: "${MAYBE_DB_USER:-maybe}"
       DB_PASSWORD: "${MAYBE_DB_PASSWORD:-maybe_db_password_change_me}"
     depends_on:
-      - maybe-db
-      - maybe-redis
+      maybe-db:
+        condition: service_healthy
+      maybe-redis:
+        condition: service_started
     volumes:
       - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/maybe/storage:/rails/storage
     networks:
