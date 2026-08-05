@@ -46,6 +46,11 @@ backup_20260729_173118
 *.sql
 *.tar.gz
 
+# Local Private Documentation & Notes (Not committed to Git)
+docs_local/
+docs_private/
+notes/
+
 # OS / Editor Specific Files
 .DS_Store
 Thumbs.db
