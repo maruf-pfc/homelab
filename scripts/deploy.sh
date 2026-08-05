@@ -86,6 +86,7 @@ check_port_conflict() {
 [ "${ENABLE_IT_TOOLS}" = "true" ] && check_port_conflict "IT-Tools" "${IT_TOOLS_PORT:-8091}"
 [ "${ENABLE_MAYBE}" = "true" ] && check_port_conflict "Maybe Finance" "${MAYBE_PORT:-8092}"
 [ "${ENABLE_LEANTIME}" = "true" ] && check_port_conflict "Leantime" "${LEANTIME_PORT:-8090}"
+[ "${ENABLE_LEANTIME_DEV}" = "true" ] && check_port_conflict "Leantime Telegram (Dev)" "${LEANTIME_DEV_PORT:-8098}"
 [ "${ENABLE_JELLYFIN}" = "true" ] && check_port_conflict "Jellyfin" "${JELLYFIN_PORT:-8096}"
 [ "${ENABLE_PROMETHEUS}" = "true" ] && check_port_conflict "Prometheus" "${PROMETHEUS_PORT:-9093}"
 [ "${ENABLE_GRAFANA}" = "true" ] && check_port_conflict "Grafana" "${GRAFANA_PORT:-3005}"
@@ -144,6 +145,7 @@ fi
 echo -e "${CYAN}[+] Processing Category 8: Productivity Stack (apps/productivity)...${NC}"
 PROD_SERVICES=()
 [ "${ENABLE_LEANTIME:-false}" = "true" ] && PROD_SERVICES+=(leantime-db leantime)
+[ "${ENABLE_LEANTIME_DEV:-false}" = "true" ] && PROD_SERVICES+=(leantime-db leantime-telegram)
 [ "${ENABLE_CHANGEDETECTION:-false}" = "true" ] && PROD_SERVICES+=(changedetection)
 if [ ${#PROD_SERVICES[@]} -gt 0 ]; then
     mkdir -p "${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/leantime/config"
@@ -187,6 +189,7 @@ print_service_status "Dashy (SSD)" "${ENABLE_DASHY}" "${DASHBOARD_PORT:-7575}" "
 print_service_status "IT-Tools (SSD)" "${ENABLE_IT_TOOLS}" "${IT_TOOLS_PORT:-8091}" "http://192.168.1.75:8091"
 print_service_status "Maybe Finance (SSD)" "${ENABLE_MAYBE}" "${MAYBE_PORT:-8092}" "https://finance.baaankai.dpdns.org"
 print_service_status "Leantime (SSD)" "${ENABLE_LEANTIME}" "${LEANTIME_PORT:-8090}" "http://192.168.1.75:8090"
+print_service_status "Leantime Dev (SSD)" "${ENABLE_LEANTIME_DEV:-true}" "${LEANTIME_DEV_PORT:-8098}" "http://192.168.1.75:8098"
 print_service_status "ChangeDetection (SSD)" "${ENABLE_CHANGEDETECTION:-true}" "${CHANGEDETECTION_PORT:-5001}" "http://192.168.1.75:5001"
 print_service_status "Jellyfin (HDD)" "${ENABLE_JELLYFIN}" "${JELLYFIN_PORT:-8096}" "http://192.168.1.75:8096"
 print_service_status "Prometheus (SSD)" "${ENABLE_PROMETHEUS}" "${PROMETHEUS_PORT:-9093}" "http://192.168.1.75:9093"

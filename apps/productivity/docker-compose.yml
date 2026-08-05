@@ -38,6 +38,27 @@ services:
     networks:
       - homelab
 
+  leantime-telegram:
+    image: leantime/leantime:latest
+    container_name: leantime-telegram
+    restart: unless-stopped
+    depends_on:
+      leantime-db:
+        condition: service_healthy
+    ports:
+      - "${LEANTIME_DEV_PORT:-8098}:8080"
+    environment:
+      LEAN_DB_HOST: leantime-db
+      LEAN_DB_DATABASE: ${LEANTIME_DB_NAME:-leantime}
+      LEAN_DB_USER: ${LEANTIME_DB_USER:-leantime}
+      LEAN_DB_PASSWORD: ${LEANTIME_DB_PASSWORD:-leantimepassword}
+      LEAN_APP_URL: "http://192.168.1.75:${LEANTIME_DEV_PORT:-8098}"
+    volumes:
+      - /home/maruf/Documents/GitHub/blackstart-labs/leantime:/var/www/html
+      - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/leantime/config:/var/www/html/userfiles
+    networks:
+      - homelab
+
   stirling-pdf:
     image: frooodle/s-pdf:latest
     container_name: stirling-pdf

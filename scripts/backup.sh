@@ -21,15 +21,22 @@ mkdir -p "${BACKUP_DIR}"
 echo "[+] Starting Homelab Backup at $(date)"
 echo "[+] Destination: ${BACKUP_DIR}"
 
+# Load environment variables for DB passwords
+if [ -f "${ROOT_DIR}/.env" ]; then
+    set -a
+    source "${ROOT_DIR}/.env"
+    set +a
+fi
+
 # 1. Database Dumps
 if docker ps --format '{{.Names}}' | grep -Eq '^leantime-db$'; then
     echo "[+] Exporting MariaDB dump for Leantime..."
-    docker exec leantime-db mariadb-dump -u root -prootpassword --all-databases > "${BACKUP_DIR}/leantime_db_dump.sql" || echo "[!] MariaDB dump warning."
+    docker exec leantime-db mariadb-dump -u root -p"${LEANTIME_DB_ROOT_PASSWORD:-rootpassword}" --all-databases > "${BACKUP_DIR}/leantime_db_dump.sql" || echo "[!] MariaDB dump warning."
 fi
 
 if docker ps --format '{{.Names}}' | grep -Eq '^maybe-db$'; then
     echo "[+] Exporting PostgreSQL dump for Maybe Finance..."
-    docker exec maybe-db pg_dumpall -U maybe > "${BACKUP_DIR}/maybe_db_dump.sql" || echo "[!] PostgreSQL dump warning."
+    docker exec maybe-db pg_dumpall -U "${MAYBE_DB_USER:-maybe}" > "${BACKUP_DIR}/maybe_db_dump.sql" || echo "[!] PostgreSQL dump warning."
 fi
 
 # 2. Archive SSD Configurations & Volumes
