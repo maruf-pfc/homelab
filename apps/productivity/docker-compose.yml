@@ -33,7 +33,7 @@ services:
       LEAN_DB_DATABASE: ${LEANTIME_DB_NAME:-leantime}
       LEAN_DB_USER: ${LEANTIME_DB_USER:-leantime}
       LEAN_DB_PASSWORD: ${LEANTIME_DB_PASSWORD:-leantimepassword}
-      LEAN_APP_URL: "http://192.168.1.75:${LEANTIME_PORT:-8090}"
+      LEAN_APP_URL: "${LEANTIME_URL:-http://192.168.1.75:8090}"
     volumes:
       - /home/maruf/homelab/github/leantime:/var/www/html
       - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/leantime/config:/var/www/html/userfiles
