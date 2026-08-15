@@ -148,9 +148,8 @@ PROD_SERVICES=()
 [ "${ENABLE_LEANTIME_DEV:-false}" = "true" ] && PROD_SERVICES+=(leantime-db leantime-telegram)
 [ "${ENABLE_CHANGEDETECTION:-false}" = "true" ] && PROD_SERVICES+=(changedetection)
 if [ ${#PROD_SERVICES[@]} -gt 0 ]; then
-    mkdir -p "${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/leantime/config"
-    mkdir -p "${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/leantime/mysql"
-    mkdir -p "${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/changedetection"
+    [ "${ENABLE_LEANTIME:-false}" = "true" ] || [ "${ENABLE_LEANTIME_DEV:-false}" = "true" ] && mkdir -p "${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/leantime/config" "${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/leantime/mysql"
+    [ "${ENABLE_CHANGEDETECTION:-false}" = "true" ] && mkdir -p "${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/changedetection"
     run_stack_service "${ROOT_DIR}/apps/productivity/docker-compose.yml" "${PROD_SERVICES[@]}"
 fi
 
