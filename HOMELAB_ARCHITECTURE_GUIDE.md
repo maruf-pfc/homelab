@@ -26,8 +26,9 @@ flowchart TD
                 LEAN["Leantime + MariaDB (Port 8090)"]
             end
             
-            subgraph Dash["Dashboard & Tools"]
-                DSH["Dashy Dashboard (Port 7575)"]
+            subgraph Sys["Sysadmin & Git Forge"]
+                FORG["Forgejo Git Server (Port 3000)"]
+                NTFY["ntfy Push Alerts (Port 8088)"]
                 ITT["IT-Tools (Port 8091)"]
             end
             
@@ -38,6 +39,7 @@ flowchart TD
             subgraph Mon["Observability Pipeline"]
                 PROM["Prometheus (Port 9093)"]
                 GRAF["Grafana (Port 3005)"]
+                SCRUT["Scrutiny SMART Health (Port 8089)"]
                 NODE["Node-Exporter (Port 9100)"]
                 CADV["cAdvisor (Port 8083)"]
             end
@@ -45,13 +47,14 @@ flowchart TD
     end
 
     CF <==>|Encrypted Tunnel Connection| CFT
-    CFT -->|Internal Route| DSH
+    CFT -->|Internal Route| FORG
+    CFT -->|Internal Route| NTFY
+    CFT -->|Internal Route| SCRUT
     CFT -->|Internal Route| JEL
     CFT -->|Internal Route| MAY
     CFT -->|Internal Route| LEAN
     CFT -->|Internal Route| GRAF
     CFT -->|Internal Route| PRT
-    CFT -->|Internal Route| KUMA
 
     PROM -->|Scrape| NODE
     PROM -->|Scrape| CADV

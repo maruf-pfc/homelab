@@ -38,7 +38,9 @@ Production-grade, category-wise modular, self-hosted homelab infrastructure opti
 | **Cloudflare Tunnel** | 4: Network | Outbound only | Host daemon | Systemd service — managed via Cloudflare dashboard |
 | **Portainer** | 10: Sysadmin | `9000`, `9443` | HDD | Docker stack & container management |
 | **IT-Tools** | 10: Sysadmin | `8091` | Stateless | Developer & sysadmin utilities |
-| **Dashy** | 3: Dashboards | `7575` | SSD | Homelab dashboard & service portal |
+| **Forgejo** | 10: Sysadmin | `3000` (HTTP), `2222` (SSH) | SSD | Lightweight self-hosted Git service |
+| **ntfy** | 10: Sysadmin | `8088` | SSD | HTTP-based pub-sub push notification service |
+| **Scrutiny** | 5: Monitoring | `8089` | SSD | Hard drive S.M.A.R.T. health & metrics dashboard |
 | **Maybe Finance** | 2: Finance | `8092` | SSD | Personal finance & net worth tracker |
 | **Maybe Postgres** | 2: Finance | `5432` (internal) | SSD | PostgreSQL backend for Maybe |
 | **Leantime** | 8: Productivity | `8090` | SSD | Lean project management platform |

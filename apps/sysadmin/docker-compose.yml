@@ -33,6 +33,50 @@ services:
     networks:
       - homelab
 
+  forgejo:
+    image: codeberg.org/forgejo/forgejo:9
+    container_name: forgejo
+    restart: unless-stopped
+    environment:
+      - USER_UID=${PUID:-1000}
+      - USER_GID=${PGID:-1000}
+      - FORGEJO__server__DOMAIN=${FORGEJO_DOMAIN:-forgejo.baaankai.dpdns.org}
+      - FORGEJO__server__SSH_PORT=${FORGEJO_SSH_PORT:-2222}
+      - FORGEJO__server__HTTP_PORT=3000
+      - FORGEJO__server__ROOT_URL=${FORGEJO_URL:-https://forgejo.baaankai.dpdns.org}
+      - FORGEJO__service__DISABLE_REGISTRATION=${FORGEJO_DISABLE_REGISTRATION:-false}
+    ports:
+      - "${FORGEJO_HTTP_PORT:-3000}:3000"
+      - "${FORGEJO_SSH_PORT:-2222}:22"
+    volumes:
+      - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/forgejo:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - homelab
+
+  ntfy:
+    image: binwiederhier/ntfy:latest
+    container_name: ntfy
+    restart: unless-stopped
+    command:
+      - serve
+    environment:
+      - TZ=${TZ:-Asia/Dhaka}
+      - NTFY_BASE_URL=${NTFY_URL:-https://ntfy.baaankai.dpdns.org}
+      - NTFY_CACHE_FILE=/var/cache/ntfy/cache.db
+      - NTFY_AUTH_FILE=/var/lib/ntfy/auth.db
+      - NTFY_ATTACHMENT_CACHE_DIR=/var/cache/ntfy/attachments
+      - NTFY_ENABLE_LOGIN=true
+    ports:
+      - "${NTFY_PORT:-8088}:80"
+    volumes:
+      - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/ntfy/cache:/var/cache/ntfy
+      - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/ntfy/data:/var/lib/ntfy
+      - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/ntfy/etc:/etc/ntfy
+    networks:
+      - homelab
+
 networks:
   homelab:
     external: true

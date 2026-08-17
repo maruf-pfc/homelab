@@ -1,15 +1,4 @@
 services:
-  dashy:
-    image: lissy93/dashy:latest
-    container_name: dashy
-    restart: unless-stopped
-    ports:
-      - "${DASHBOARD_PORT:-7575}:8080"
-    volumes:
-      - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/dashy/conf.yml:/app/user-data/conf.yml
-    networks:
-      - homelab
-
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage

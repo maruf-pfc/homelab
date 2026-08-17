@@ -69,7 +69,7 @@ A comprehensive, categorized reference guide to popular open-source and self-hos
 
 | App / Tool | Category | Port | Footprint | Description | Tech Stack & Database | Storage |
 | :--- | :--- | :---: | :---: | :--- | :--- | :--- |
-| **Dashy** | Dashboard | `7575` | 🟢 Lightweight | Feature-rich, highly customizable homelab dashboard. *(Active in homelab)* | `Vue.js` / `YAML Config (No DB)` | SSD |
+| **Dashy** | Dashboard | `7575` | 🟢 Lightweight | Feature-rich, highly customizable homelab dashboard. | `Vue.js` / `YAML Config (No DB)` | SSD |
 | **Homarr** | Dashboard | `7575` | 🟢 Lightweight | Customizable dashboard with real-time Docker integration widgets. | `Next.js / Node.js` / `SQLite` | SSD / HDD |
 | **Homepage** | Dashboard | `3000` | 🟢 Lightweight | Highly customizable, YAML-configured dashboard with service integration badges. | `Next.js / React` / `YAML Config (No DB)` | SSD |
 | **Glance** | All-in-One Feed | `8080` | ⚡ Ultra-Light | Ultra-fast feed aggregator for RSS, Reddit, weather, and server status. | `Go` / `YAML Config (No DB)` | SSD |
@@ -110,9 +110,9 @@ A comprehensive, categorized reference guide to popular open-source and self-hos
 | **Dozzle** | Log Viewer | `8080` | ⚡ Ultra-Light | Real-time log viewer for Docker containers with instant filtering. | `Go / Vue` / `Stateless (No DB)` | Lightweight |
 | **Loki + Promtail** | Log Aggregation | `3100` | 🟡 Moderate | Prometheus-inspired log aggregation system optimized for Grafana. | `Go` / `Loki Index + Filesystem` | SSD + HDD |
 | **Gatus** | Health Dashboard | `8080` | ⚡ Ultra-Light | Developer-oriented health dashboard with status badges and incident logs. | `Go` / `SQLite / Postgres` | SSD |
-| **ntfy** | Push Notifications | `80` | ⚡ Ultra-Light | HTTP-based pub-sub notification service for sending phone/desktop alerts. | `Go` / `SQLite` | SSD |
+| **ntfy** | Push Notifications | `8088` | ⚡ Ultra-Light | HTTP-based pub-sub notification service for sending phone/desktop alerts. *(Active in homelab)* | `Go` / `SQLite` | SSD |
 | **Gotify** | Push Notifications | `80` | ⚡ Ultra-Light | Self-hosted push notification server for real-time alert messages. | `Go / React` / `SQLite` | SSD |
-| **Scrutiny** | Drive Health | `8080` | 🟢 Lightweight | Web UI for monitoring S.M.A.R.T. hard drive health metrics and failure predictions. | `Go / Vue` / `InfluxDB` | SSD |
+| **Scrutiny** | Drive Health | `8089` | 🟢 Lightweight | Web UI for monitoring S.M.A.R.T. hard drive health metrics and failure predictions. *(Active in homelab)* | `Go / Vue` / `InfluxDB` | SSD |
 
 ---
 
@@ -191,7 +191,7 @@ A comprehensive, categorized reference guide to popular open-source and self-hos
 | :--- | :--- | :---: | :---: | :--- | :--- | :--- |
 | **Portainer** | Container Manager | `9000` | ⚡ Ultra-Light | GUI tool for managing Docker containers, stacks, volumes, and networks. *(Active)* | `Go / Angular` / `BoltDB` | SSD |
 | **Dockge** | Docker Stack Manager | `5001` | ⚡ Ultra-Light | Reactive, clean Docker Compose stack manager created by the author of Uptime Kuma. | `Node.js / Vue` / `YAML Compose Files` | SSD |
-| **Forgejo / Gitea** | Git Server | `3000` | 🟢 Lightweight | Lightweight, fast self-hosted Git service (GitHub/GitLab alternative). | `Go / React` / `SQLite / PostgreSQL` | SSD |
+| **Forgejo / Gitea** | Git Server | `3000` | 🟢 Lightweight | Lightweight, fast self-hosted Git service (GitHub/GitLab alternative). *(Active in homelab)* | `Go / React` / `SQLite / PostgreSQL` | SSD |
 | **Woodpecker CI** | CI/CD Engine | `8000` | 🟢 Lightweight | Simple, container-based CI/CD engine that integrates with Forgejo/Gitea. | `Go / Vue` / `SQLite / Postgres` | SSD |
 | **IT-Tools** | Admin Utilities | `8091` | ⚡ Ultra-Light | Handy online tools for developers and sysadmins. *(Active in homelab)* | `Vue.js (Client-side JS)` / `Stateless (No DB)` | Stateless |
 | **Watchtower** | Auto-Updater | Background | ⚡ Ultra-Light | Automatically updates running Docker containers when new images are published. | `Go` / `Stateless` | Stateless |

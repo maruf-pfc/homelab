@@ -36,7 +36,9 @@ A core design principle is **Storage Tiering** — fast SSD for databases and co
 | `volumes/maybe/postgres` | Maybe Postgres | Relational DB with frequent queries |
 | `volumes/maybe/redis` | Maybe Redis | In-memory cache |
 | `volumes/grafana` | Grafana | SQLite state + dashboard reads |
-| `volumes/dashy` | Dashy | Config file reads on every page load |
+| `volumes/forgejo` | Forgejo | Git repositories & SQLite DB |
+| `volumes/ntfy` | ntfy | Pub-sub cache & auth DB |
+| `volumes/scrutiny` | Scrutiny | S.M.A.R.T. metrics InfluxDB & config |
 | `volumes/changedetection` | ChangeDetection | Frequent diff writes |
 | `volumes/sonarr`, `radarr`… | Arr suite | Config + DB writes on indexer scan |
 
@@ -80,14 +82,14 @@ All Docker services attach to a single custom bridge network named `homelab`. Ex
      ┌──────────┬────────────┼────────────┬──────────────┐
      ▼          ▼            ▼            ▼              ▼
 ┌─────────┐ ┌────────┐ ┌─────────┐ ┌──────────┐ ┌────────────────┐
-│  Dashy  │ │ Maybe  │ │Leantime │ │ Grafana  │ │ChangeDetection │
-│  :7575  │ │ :8092  │ │  :8090  │ │  :3005   │ │    :5001       │
+│ Forgejo │ │ Maybe  │ │Leantime │ │ Grafana  │ │    Scrutiny    │
+│  :3000  │ │ :8092  │ │  :8090  │ │  :3005   │ │     :8089      │
 └─────────┘ └────────┘ └─────────┘ └──────────┘ └────────────────┘
-     ▼          ▼            ▼
-┌──────────┐ ┌────────┐ ┌──────────────┐
-│ Jellyfin │ │Portainer│ │  Prometheus  │
-│  :8096   │ │ :9000  │ │    :9093     │
-└──────────┘ └────────┘ └──────────────┘
+     ▼          ▼            ▼            ▼
+┌──────────┐ ┌────────┐ ┌──────────────┐┌─────────┐
+│ Jellyfin │ │Portainer│ │  Prometheus  ││  ntfy   │
+│  :8096   │ │ :9000  │ │    :9093     ││  :8088  │
+└──────────┘ └────────┘ └──────────────┘└─────────┘
 ```
 
 ### Network Rules

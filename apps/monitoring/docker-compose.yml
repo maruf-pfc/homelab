@@ -61,6 +61,28 @@ services:
     networks:
       - homelab
 
+  scrutiny:
+    image: ghcr.io/analogj/scrutiny:master-omnibus
+    container_name: scrutiny
+    restart: unless-stopped
+    ports:
+      - "${SCRUTINY_PORT:-8089}:8080"
+    environment:
+      - SCRUTINY_WEB_PORT=8080
+      - SCRUTINY_WEB_BASEPATH=""
+    cap_add:
+      - SYS_RAWIO
+      - SYS_ADMIN
+    devices:
+      - /dev/sda:/dev/sda
+      - /dev/sdb:/dev/sdb
+    volumes:
+      - /run/udev:/run/udev:ro
+      - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/scrutiny/config:/opt/scrutiny/config
+      - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/scrutiny/influxdb:/opt/scrutiny/influxdb
+    networks:
+      - homelab
+
 networks:
   homelab:
     external: true

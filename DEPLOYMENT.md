@@ -82,7 +82,7 @@ docker compose --env-file .env -f apps/monitoring/docker-compose.yml up -d prome
 docker compose --env-file .env -f apps/productivity/docker-compose.yml up -d leantime-db leantime changedetection
 
 # Category 10: Sysadmin
-docker compose --env-file .env -f apps/sysadmin/docker-compose.yml up -d portainer it-tools
+docker compose --env-file .env -f apps/sysadmin/docker-compose.yml up -d portainer it-tools forgejo ntfy
 ```
 
 > **Note:** Always pass `--env-file .env` when running compose directly, to ensure all variables are loaded from your active configuration.
@@ -143,6 +143,9 @@ tail -f /home/maruf/homelab/backups/backup.log
 | :--- | :---: |
 | Portainer | `9000`, `9443` |
 | Uptime Kuma | `3001` |
+| Forgejo | `3000` (HTTP), `2222` (SSH) |
+| ntfy | `8088` |
+| Scrutiny | `8089` |
 | Dashy | `7575` |
 | Grafana | `3005` |
 | Prometheus | `9093` |
