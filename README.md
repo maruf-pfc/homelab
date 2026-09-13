@@ -45,6 +45,8 @@ Production-grade, category-wise modular, self-hosted homelab infrastructure opti
 | **Maybe Postgres** | 2: Finance | `5432` (internal) | SSD | PostgreSQL backend for Maybe |
 | **Leantime** | 8: Productivity | `8090` | SSD | Lean project management platform |
 | **Leantime MariaDB** | 8: Productivity | `3306` (internal) | SSD | MariaDB 11 backend for Leantime |
+| **Kimai** | 8: Productivity | `8095` | SSD | Open-source time-tracking, project budgeting & invoicing |
+| **Kimai MariaDB** | 8: Productivity | `3306` (internal) | SSD | MariaDB 11 backend for Kimai |
 | **ChangeDetection** | 8: Productivity | `5001` | SSD | Website change monitoring |
 | **Stirling PDF** | 8: Productivity | `8084` | Stateless | Self-hosted PDF toolbox |
 | **Memos** | 8: Productivity | `5230` | SSD | Lightweight note-taking |
@@ -73,6 +75,7 @@ Production-grade, category-wise modular, self-hosted homelab infrastructure opti
 ├── BACKUP_AND_RESTORE_GUIDE.md   # Backup & restore procedures, cron setup
 ├── SECURITY.md                   # Security best practices & hardening guide
 ├── RECOMMENDED_TOOLS.md          # 12-category self-hosted tools catalog
+├── RECOMMENDED_OPEN_SOURCE_APPS.md # Open-source apps & dev tools catalog (14 categories)
 ├── docker-compose.yml            # Master compose file (uses 'include' directive)
 ├── apps/                         # 12 Category-Wise Application Stacks
 │   ├── media/                    # Category 1: Media (Jellyfin, Sonarr, Radarr…)
@@ -114,6 +117,7 @@ nano .env           # Set passwords, paths, and feature toggles
 In `.env`, set `ENABLE_<SERVICE>=true` for each service you want to run:
 ```bash
 ENABLE_LEANTIME=true
+ENABLE_KIMAI=true
 ENABLE_MAYBE=true
 ENABLE_CHANGEDETECTION=true
 ENABLE_GRAFANA=true

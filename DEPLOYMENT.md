@@ -78,8 +78,8 @@ journalctl -u cloudflared -f --no-pager
 # Category 5: Monitoring
 docker compose --env-file .env -f apps/monitoring/docker-compose.yml up -d prometheus grafana node-exporter cadvisor
 
-# Category 8: Productivity (MariaDB must be healthy before leantime starts)
-docker compose --env-file .env -f apps/productivity/docker-compose.yml up -d leantime-db leantime changedetection
+# Category 8: Productivity (MariaDB must be healthy before apps start)
+docker compose --env-file .env -f apps/productivity/docker-compose.yml up -d leantime-db leantime kimai-db kimai changedetection
 
 # Category 10: Sysadmin
 docker compose --env-file .env -f apps/sysadmin/docker-compose.yml up -d portainer it-tools forgejo ntfy
@@ -151,6 +151,7 @@ tail -f /home/maruf/homelab/backups/backup.log
 | Prometheus | `9093` |
 | cAdvisor | `8083` |
 | Leantime | `8090` |
+| Kimai | `8095` |
 | Maybe Finance | `8092` |
 | IT-Tools | `8091` |
 | Jellyfin | `8096` |
@@ -193,6 +194,13 @@ docker exec leantime-db mariadb -u root -p'<old_root_password>' \
 
 # Then restart leantime to pick up the env
 docker compose --env-file .env -f apps/productivity/docker-compose.yml up -d --force-recreate leantime
+```
+
+### Kimai container crashes with AH00058 (Error retrieving pid file)
+If Kimai unexpectedly stops or the host reboots abruptly, Apache can leave behind `/var/run/apache2/apache2.pid`. Kimai's entrypoint in `apps/productivity/docker-compose.yml` automatically removes this file on startup (`rm -f /var/run/apache2/apache2.pid`). If manually recovering an existing container:
+```bash
+docker exec kimai rm -f /var/run/apache2/apache2.pid
+docker compose --env-file .env -f apps/productivity/docker-compose.yml up -d --force-recreate kimai
 ```
 
 ### Cloudflare Tunnel offline (Error 1033 / services unreachable)

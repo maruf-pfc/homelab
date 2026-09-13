@@ -2,6 +2,8 @@
 
 A comprehensive, categorized reference guide to popular open-source and self-hosted tools. Includes resource usage profiles (Lightweight / Moderate / Heavy), underlying technology stacks, and database dependencies.
 
+> 💡 **Looking for desktop software, modern CLI utilities, and workstation apps?** See [**`RECOMMENDED_OPEN_SOURCE_APPS.md`**](file:///home/maruf/homelab/RECOMMENDED_OPEN_SOURCE_APPS.md).
+
 ---
 
 ## 📌 Resource Footprint Legend
@@ -154,6 +156,7 @@ A comprehensive, categorized reference guide to popular open-source and self-hos
 | App / Tool | Category | Port | Footprint | Description | Tech Stack & Database | Storage |
 | :--- | :--- | :---: | :---: | :--- | :--- | :--- |
 | **Leantime** | Project Management | `8090` | 🟡 Moderate | Lean project management platform designed for developers. *(Active)* | `PHP / Vue` / `MariaDB / MySQL` | SSD |
+| **Kimai** | Time Tracking & Invoices | `8095` | 🟢 Lightweight | Full-featured time tracker with project budgets, client invoicing & timesheets. *(Active)* | `PHP (Symfony)` / `MariaDB` | SSD |
 | **Vikunja** | Task & ToDo Manager | `3456` | 🟢 Lightweight | Feature-rich task manager with ToDo lists, Kanban, Gantt charts, and reminders. | `Go / Vue` / `SQLite / Postgres` | SSD |
 | **Planka** | Kanban Board | `1337` | 🟢 Lightweight | Elegant real-time Kanban board for project tracking (Trello alternative). | `Node.js / React` / `PostgreSQL` | SSD |
 | **BookStack** | Wiki & Documentation | `8080` | 🟡 Moderate | Highly organized, book-structured wiki platform for team documentation. | `PHP (Laravel)` / `MariaDB / MySQL` | SSD |

@@ -17,9 +17,10 @@ All backups are managed by `./scripts/backup.sh`.
 
 ### What's captured in each snapshot:
 1. **`leantime_db_dump.sql`** — Full MariaDB export for Leantime (all 37 tables)
-2. **`maybe_db_dump.sql`** — Full PostgreSQL export for Maybe Finance
-3. **`ssd_homelab_configs.tar.gz`** — All compose files, `apps/`, `.env`, and `/home/maruf/homelab/volumes/`
-4. **`hdd_service_volumes.tar.gz`** — `/home/maruf/MyHDDStorage/docker/volumes/` (Portainer, Uptime Kuma, Jellyfin)
+2. **`kimai_db_dump.sql`** — Full MariaDB export for Kimai
+3. **`maybe_db_dump.sql`** — Full PostgreSQL export for Maybe Finance
+4. **`ssd_homelab_configs.tar.gz`** — All compose files, `apps/`, `.env`, and `/home/maruf/homelab/volumes/`
+5. **`hdd_service_volumes.tar.gz`** — `/home/maruf/MyHDDStorage/docker/volumes/` (Portainer, Uptime Kuma, Jellyfin)
 
 ---
 
@@ -108,7 +109,18 @@ docker exec -i maybe-db psql \
 docker restart maybe
 ```
 
-#### Step 4 — Restore HDD service volumes (Portainer, Uptime Kuma, Jellyfin)
+#### Step 4 — Restore Kimai (MariaDB)
+```bash
+source /home/maruf/homelab/.env
+
+docker exec -i kimai-db mariadb \
+  -u root -p"${KIMAI_DB_ROOT_PASSWORD}" \
+  "${KIMAI_DB_NAME:-kimai}" < kimai_db_dump.sql
+
+docker restart kimai
+```
+
+#### Step 5 — Restore HDD service volumes (Portainer, Uptime Kuma, Jellyfin)
 ```bash
 docker stop portainer uptime-kuma jellyfin
 
@@ -120,9 +132,9 @@ docker run --rm \
 ./scripts/deploy.sh
 ```
 
-#### Step 5 — Restore SSD configs & volumes
+#### Step 6 — Restore SSD configs & volumes
 ```bash
-docker stop leantime leantime-db maybe maybe-db maybe-redis grafana
+docker stop leantime leantime-db kimai kimai-db maybe maybe-db maybe-redis grafana
 
 tar -zxvf ssd_homelab_configs.tar.gz -C /home/maruf/homelab/
 
