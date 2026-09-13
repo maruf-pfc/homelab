@@ -61,7 +61,6 @@ ENABLE_CLOUDFLARED="${ENABLE_CLOUDFLARED:-true}"
 
 # Optional Catalog Stack Flags
 ENABLE_VAULTWARDEN="${ENABLE_VAULTWARDEN:-false}"
-ENABLE_KIMAI="${ENABLE_KIMAI:-true}"
 
 # 4. Pre-Flight Port Conflict Validation
 echo -e "${GREEN}[+] Performing pre-flight port collision & security checks...${NC}"
@@ -101,7 +100,6 @@ check_port_conflict() {
 [ "${ENABLE_CADVISOR}" = "true" ] && check_port_conflict "cAdvisor" "${CADVISOR_PORT:-8083}"
 [ "${ENABLE_NODE_EXPORTER}" = "true" ] && check_port_conflict "Node Exporter" "${NODE_EXPORTER_PORT:-9100}"
 [ "${ENABLE_VAULTWARDEN}" = "true" ] && check_port_conflict "Vaultwarden" "${VAULTWARDEN_PORT:-8082}"
-[ "${ENABLE_KIMAI}" = "true" ] && check_port_conflict "Kimai" "${KIMAI_PORT:-8095}"
 
 echo -e "${GREEN}[✓] Port conflict validation passed cleanly!${NC}"
 
@@ -163,11 +161,9 @@ PROD_SERVICES=()
 [ "${ENABLE_LEANTIME:-false}" = "true" ] && PROD_SERVICES+=(leantime-db leantime)
 [ "${ENABLE_LEANTIME_DEV:-false}" = "true" ] && PROD_SERVICES+=(leantime-db leantime-telegram)
 [ "${ENABLE_CHANGEDETECTION:-false}" = "true" ] && PROD_SERVICES+=(changedetection)
-[ "${ENABLE_KIMAI:-false}" = "true" ] && PROD_SERVICES+=(kimai-db kimai)
 if [ ${#PROD_SERVICES[@]} -gt 0 ]; then
     [ "${ENABLE_LEANTIME:-false}" = "true" ] || [ "${ENABLE_LEANTIME_DEV:-false}" = "true" ] && mkdir -p "${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/leantime/config" "${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/leantime/mysql"
     [ "${ENABLE_CHANGEDETECTION:-false}" = "true" ] && mkdir -p "${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/changedetection"
-    [ "${ENABLE_KIMAI:-false}" = "true" ] && mkdir -p "${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/kimai/mysql" "${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/kimai/data" "${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/kimai/plugins"
     run_stack_service "${ROOT_DIR}/apps/productivity/docker-compose.yml" "${PROD_SERVICES[@]}"
 fi
 
@@ -218,7 +214,6 @@ print_service_status "Scrutiny (SSD)" "${ENABLE_SCRUTINY}" "${SCRUTINY_PORT:-808
 print_service_status "Maybe Finance (SSD)" "${ENABLE_MAYBE}" "${MAYBE_PORT:-8092}" "https://finance.baaankai.dpdns.org"
 print_service_status "Leantime (SSD)" "${ENABLE_LEANTIME}" "${LEANTIME_PORT:-8090}" "http://192.168.1.75:8090"
 print_service_status "Leantime Dev (SSD)" "${ENABLE_LEANTIME_DEV:-false}" "${LEANTIME_DEV_PORT:-8098}" "http://192.168.1.75:8098"
-print_service_status "Kimai (SSD)" "${ENABLE_KIMAI:-true}" "${KIMAI_PORT:-8095}" "http://192.168.1.75:8095"
 print_service_status "ChangeDetection (SSD)" "${ENABLE_CHANGEDETECTION:-false}" "${CHANGEDETECTION_PORT:-5001}" "http://192.168.1.75:5001"
 print_service_status "Jellyfin (HDD)" "${ENABLE_JELLYFIN}" "${JELLYFIN_PORT:-8096}" "http://192.168.1.75:8096"
 print_service_status "Prometheus (SSD)" "${ENABLE_PROMETHEUS}" "${PROMETHEUS_PORT:-9093}" "http://192.168.1.75:9093"

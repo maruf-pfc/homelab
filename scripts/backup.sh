@@ -34,11 +34,6 @@ if docker ps --format '{{.Names}}' | grep -Eq '^leantime-db$'; then
     docker exec leantime-db mariadb-dump -u root -p"${LEANTIME_DB_ROOT_PASSWORD:-rootpassword}" --all-databases > "${BACKUP_DIR}/leantime_db_dump.sql" || echo "[!] MariaDB dump warning."
 fi
 
-if docker ps --format '{{.Names}}' | grep -Eq '^kimai-db$'; then
-    echo "[+] Exporting MariaDB dump for Kimai..."
-    docker exec kimai-db mariadb-dump -u root -p"${KIMAI_DB_ROOT_PASSWORD:-rootpassword}" --all-databases > "${BACKUP_DIR}/kimai_db_dump.sql" || echo "[!] Kimai MariaDB dump warning."
-fi
-
 if docker ps --format '{{.Names}}' | grep -Eq '^maybe-db$'; then
     echo "[+] Exporting PostgreSQL dump for Maybe Finance..."
     docker exec maybe-db pg_dumpall -U "${MAYBE_DB_USER:-maybe}" > "${BACKUP_DIR}/maybe_db_dump.sql" || echo "[!] PostgreSQL dump warning."
