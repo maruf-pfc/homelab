@@ -31,6 +31,10 @@ Explore the full homelab visually with our high-performance static portal:
 
 ### 1. Ingress & Zero Trust Network Topology
 
+<p align="center">
+  <img src="assets/ingress_topology_diagram.png" alt="Zero Trust Edge Ingress Architecture Diagram" width="100%" />
+</p>
+
 ```mermaid
 flowchart TD
     subgraph Public["Public Internet & Edge Network"]
@@ -87,6 +91,10 @@ flowchart TD
 
 ### 2. Smart Dual-Tier Storage Architecture
 
+<p align="center">
+  <img src="assets/storage_tiering_diagram.png" alt="Smart Dual-Tier Storage Architecture Diagram" width="100%" />
+</p>
+
 ```mermaid
 flowchart LR
     Node["Homelab Host Server (mms)"]
@@ -112,6 +120,10 @@ flowchart LR
 
 ### 3. Automated Disaster Recovery Pipeline (03:00 AM Cron)
 
+<p align="center">
+  <img src="assets/backup_pipeline_diagram.png" alt="Automated Disaster Recovery Pipeline Diagram" width="100%" />
+</p>
+
 ```mermaid
 sequenceDiagram
     autonumber
@@ -131,6 +143,14 @@ sequenceDiagram
     Script->>HDD: Purge previous archives (1 master retention)
     Script-->>Cron: Log result to backups/backup.log
 ```
+
+---
+
+### 4. Complete System Architecture Blueprint
+
+<p align="center">
+  <img src="assets/system_blueprint_diagram.png" alt="Homelab Complete System Architecture Blueprint Diagram" width="100%" />
+</p>
 
 ---
 

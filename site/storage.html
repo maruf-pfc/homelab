@@ -61,6 +61,10 @@
           </p>
         </div>
 
+        <div style="margin-bottom: 32px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-medium); box-shadow: 0 8px 32px rgba(0,0,0,0.4);">
+          <img src="assets/storage_tiering_diagram.png" alt="Dual Storage Architecture Diagram" style="width: 100%; height: auto; display: block; border-radius: 12px;">
+        </div>
+
         <div class="architecture-grid">
           <!-- Tier 1: SSD -->
           <div class="tier-card reveal">
@@ -146,6 +150,10 @@
           <p class="section-subheadline">
             Automated snapshot cron executing at 03:00 AM daily. Dumps live databases, archives volumes, mirrors to secondary HDD, and enforces 1-snapshot retention.
           </p>
+        </div>
+
+        <div style="margin-bottom: 32px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-medium); box-shadow: 0 8px 32px rgba(0,0,0,0.4);">
+          <img src="assets/backup_pipeline_diagram.png" alt="Disaster Recovery Pipeline Diagram" style="width: 100%; height: auto; display: block; border-radius: 12px;">
         </div>
 
         <div class="backup-timeline" id="backup-pipeline-steps">

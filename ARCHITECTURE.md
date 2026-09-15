@@ -1,5 +1,9 @@
 # 🏛️ Architecture & Infrastructure Specification
 
+<p align="center">
+  <img src="assets/homelab_cover.png" alt="Homelab Architecture Specification" width="100%" />
+</p>
+
 [![Live Architecture Portal](https://img.shields.io/badge/Live%20Portal-Interactive%20Architecture-cyan?logo=safari)](site/index.html)
 [![Storage Visualizer](https://img.shields.io/badge/Storage-NVMe%20%2B%20HDD%20Tiering-emerald?logo=serverfault)](site/storage.html)
 [![Port Matrix](https://img.shields.io/badge/Ports-Collision--Free%20Matrix-amber?logo=docker)](site/ports.html)
@@ -13,6 +17,10 @@ Detailed architectural design, storage tiering strategy, network topology, servi
 ## 1. Storage Tiering Strategy
 
 A core design principle is **Storage Tiering** — fast SSD for databases and configs, bulk HDD for media and backups.
+
+<p align="center">
+  <img src="assets/storage_tiering_diagram.png" alt="Storage Tiering Architecture Diagram" width="100%" />
+</p>
 
 ```
                   ┌──────────────────────────────────────────┐
@@ -62,6 +70,10 @@ A core design principle is **Storage Tiering** — fast SSD for databases and co
 ## 2. Network Topology
 
 All Docker services attach to a single custom bridge network named `homelab`. External ingress is handled exclusively by the **Cloudflare Tunnel host daemon** — not a container.
+
+<p align="center">
+  <img src="assets/ingress_topology_diagram.png" alt="Zero Trust Network Topology Diagram" width="100%" />
+</p>
 
 ```
                     ┌──────────────────────────┐
@@ -155,6 +167,10 @@ cadvisor       ──► prometheus (scrape target)
 
 ## 5. Backup Architecture
 
+<p align="center">
+  <img src="assets/backup_pipeline_diagram.png" alt="Backup Pipeline Architecture Diagram" width="100%" />
+</p>
+
 ```
          [3:00 AM — cron]
                │
@@ -195,3 +211,11 @@ cadvisor       ──► prometheus (scrape target)
 | **DB startup ordering** | `condition: service_healthy` — apps wait for DB healthcheck |
 | **Docker socket access** | Portainer & Homepage only (LAN-scoped services) |
 | **Host firewall** | UFW — deny inbound, allow LAN (192.168.1.0/24) only |
+
+---
+
+## 7. Complete System Blueprint
+
+<p align="center">
+  <img src="assets/system_blueprint_diagram.png" alt="Complete System Architecture Blueprint" width="100%" />
+</p>
