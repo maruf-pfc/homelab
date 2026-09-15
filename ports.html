@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Port Matrix &amp; Collision Inspector · Homelab Infrastructure</title>
+  <meta name="description" content="Verified mapping of host ports, container bindings, database network isolation, and Zero Trust ingress paths.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2338bdf8'%3E%3Cpath d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/%3E%3C/svg%3E" type="image/svg+xml">
+  
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Floating Island Navigation -->
+  <header class="floating-nav-wrapper">
+    <nav class="floating-nav" aria-label="Main Navigation">
+      <a href="index.html" class="nav-brand">
+        <span class="brand-indicator" aria-hidden="true"></span>
+        <span>mms.homelab</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Architecture</a></li>
+        <li><a href="services.html" class="nav-link">App Catalog</a></li>
+        <li><a href="resources.html" class="nav-link">Resources</a></li>
+        <li><a href="runbook.html" class="nav-link">Playbook</a></li>
+      </ul>
+
+      <button class="nav-search-btn" id="nav-search-trigger" aria-label="Open Command Palette (Cmd+K)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <span>Search</span>
+        <kbd>⌘K</kbd>
+      </button>
+
+      <button class="mobile-nav-toggle" id="mobile-nav-toggle" aria-label="Toggle navigation menu">
+        <span></span>
+        <span></span>
+      </button>
+    </nav>
+  </header>
+
+  <!-- Mobile Overlay -->
+  <div class="mobile-menu-overlay" id="mobile-menu-overlay" aria-hidden="true">
+    <a href="index.html">Architecture &amp; System Map</a>
+    <a href="services.html">App Catalog (12 Stacks)</a>
+    <a href="resources.html">Resources &amp; Toolkits</a>
+    <a href="runbook.html">DevOps Playbook</a>
+  </div>
+
+  <main id="main-content">
+    <section class="hero-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Port Allocation &amp; Security</span>
+          <h1 class="hero-headline">Port Matrix &amp; Collision Inspector</h1>
+          <p class="section-subheadline">
+            Complete topology of host listener ports, internal container socket bindings, protocols, and isolation boundaries.
+          </p>
+        </div>
+
+        <div style="margin-bottom: 24px;">
+          <input type="text" id="port-search-input" class="search-input" placeholder="Filter ports (e.g. 8090, MariaDB, LAN, Isolated)..." style="max-width: 440px;">
+        </div>
+
+        <div class="port-table-container reveal">
+          <table class="port-table">
+            <thead>
+              <tr>
+                <th>Host Port</th>
+                <th>Service Name</th>
+                <th>Protocol</th>
+                <th>Internal Port</th>
+                <th>Access Scope</th>
+              </tr>
+            </thead>
+            <tbody id="port-table-body">
+              <!-- Rendered by app.js -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Network Rules Box -->
+        <div class="tier-card" style="margin-top: 40px;">
+          <div class="tier-header">
+            <div class="tier-title-group">
+              <h3>Ingress Security Model</h3>
+              <p>Zero Exposed Public Ports · Internal Bridge Routing</p>
+            </div>
+            <span class="badge badge-active">Active Policy</span>
+          </div>
+          <ul class="tier-items">
+            <li class="tier-item">
+              <span class="tier-item-name">Zero Public Router Ports</span>
+              <span class="tier-item-path">Inbound ports 80/443 remain completely closed; WAN traffic routed via outbound Cloudflare QUIC tunnels.</span>
+            </li>
+            <li class="tier-item">
+              <span class="tier-item-name">Database Isolation</span>
+              <span class="tier-item-path">MariaDB 11 (3306) and PostgreSQL 15 (5432) have zero host port mappings, reachable only within the internal homelab bridge.</span>
+            </li>
+            <li class="tier-item">
+              <span class="tier-item-name">Service Healthchecks</span>
+              <span class="tier-item-path">Dependent web applications wait for database readiness via condition: service_healthy.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Command Palette Modal -->
+  <div class="modal-backdrop" id="cmd-modal" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-modal="true">
+      <div class="modal-search-header">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="modal-search-input" class="modal-search-input" placeholder="Type a command, service name, or port...">
+        <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">ESC</span>
+      </div>
+      <ul class="modal-results" id="modal-results">
+        <!-- Rendered by app.js -->
+      </ul>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-meta">
+          <p><strong style="color: #FFFFFF;">Personal Homelab Architecture</strong> · Ubuntu Linux (mms)</p>
+          <p>Collision-Free Port Allocations · Outbound QUIC Tunnels</p>
+        </div>
+        <ul class="footer-links">
+          <li><a href="index.html" class="footer-link">Architecture</a></li>
+          <li><a href="services.html" class="footer-link">App Catalog</a></li>
+          <li><a href="resources.html" class="footer-link">Resources</a></li>
+          <li><a href="runbook.html" class="footer-link">Playbook</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
