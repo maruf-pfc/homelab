@@ -1,6 +1,12 @@
 # 🏛️ Architecture & Infrastructure Specification
 
+[![Live Architecture Portal](https://img.shields.io/badge/Live%20Portal-Interactive%20Architecture-cyan?logo=safari)](site/index.html)
+[![Storage Visualizer](https://img.shields.io/badge/Storage-NVMe%20%2B%20HDD%20Tiering-emerald?logo=serverfault)](site/storage.html)
+[![Port Matrix](https://img.shields.io/badge/Ports-Collision--Free%20Matrix-amber?logo=docker)](site/ports.html)
+
 Detailed architectural design, storage tiering strategy, network topology, service dependency graph, and security model of the homelab environment.
+
+> 🌐 **Interactive Web Visualizer**: You can explore the full interactive architecture, traffic flowcharts, and port allocations live on the [**Homelab Architecture Portal**](site/index.html).
 
 ---
 

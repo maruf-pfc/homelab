@@ -1,8 +1,13 @@
 # 🧰 Popular & Recommended Homelab Tools & Applications
 
+[![Interactive App Catalog](https://img.shields.io/badge/Live%20Catalog-36%2B%20Stacks-blue?logo=safari)](site/services.html)
+[![Workstation Tools](https://img.shields.io/badge/Workstation-Desktop%20%26%20CLI-purple?logo=linux)](RECOMMENDED_OPEN_SOURCE_APPS.md)
+[![Architecture Portal](https://img.shields.io/badge/Architecture-System%20Map-cyan?logo=docker)](site/index.html)
+
 A comprehensive, categorized reference guide to popular open-source and self-hosted tools. Includes resource usage profiles (Lightweight / Moderate / Heavy), underlying technology stacks, and database dependencies.
 
-> 💡 **Looking for desktop software, modern CLI utilities, and workstation apps?** See [**`RECOMMENDED_OPEN_SOURCE_APPS.md`**](file:///home/maruf/homelab/RECOMMENDED_OPEN_SOURCE_APPS.md).
+> 🌐 **Interactive Catalog**: Filter, search, and view live compose snippets in the [**Web Application Catalog**](site/services.html).
+> 💡 **Workstation & CLI Software**: Looking for desktop software, modern Unix utilities, and developer toolkits? See [**`RECOMMENDED_OPEN_SOURCE_APPS.md`**](RECOMMENDED_OPEN_SOURCE_APPS.md).
 
 ---
 

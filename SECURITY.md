@@ -1,5 +1,12 @@
 # 🔒 Security Guidelines & Best Practices
 
+[![Zero Trust Ingress](https://img.shields.io/badge/Security-Zero%20Trust%20Tunnel-orange?logo=cloudflare)](site/ports.html)
+[![Architecture Portal](https://img.shields.io/badge/Architecture-System%20Map-cyan?logo=docker)](site/index.html)
+
+Security policies, secret isolation, network hardening, and database isolation guidelines for the homelab infrastructure.
+
+> 🌐 **Interactive Port & Ingress Inspector**: View isolated internal database networks and Zero Trust routing in the [**Port Matrix & Security Inspector**](site/ports.html).
+
 ---
 
 ## 1. Secret Hygiene & Git Isolation

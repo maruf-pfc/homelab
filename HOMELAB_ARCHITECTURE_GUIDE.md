@@ -1,7 +1,8 @@
 # 🏗️ Homelab Comprehensive Architecture & Expansion Guide
 
 > [!NOTE]
-> **Audit Status**: Your live setup is operating cleanly. All services remain online, routing securely via **Cloudflare Tunnels (`cloudflared`)** on the `homelab` Docker network.
+> **Audit Status**: Your live setup is operating cleanly. All services remain online, routing securely via **Cloudflare Tunnels (`cloudflared` host systemd daemon)** on the `homelab` Docker network.
+> 🌐 **Interactive Portal**: Explore the live interactive architecture map and service directory at [**`site/index.html`**](site/index.html).
 
 ---
 
@@ -15,8 +16,8 @@ flowchart TD
         CF["Cloudflare Edge Proxy / WAF"]
     end
 
-    subgraph Host["Homelab Host Server (Ubuntu/Debian + CasaOS)"]
-        CFT["Cloudflare Tunnel Daemon\n(cloudflared container)"]
+    subgraph Host["Homelab Host Server (Ubuntu Linux · mms)"]
+        CFT["Cloudflare Tunnel Daemon\n(cloudflared host systemd daemon)\n4 Outbound QUIC/HTTP2 Links"]
         
         subgraph Net["Docker Network: homelab"]
             direction TB

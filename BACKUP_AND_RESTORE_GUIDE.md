@@ -1,6 +1,11 @@
 # 📦 Homelab Backup & Restoration Guide
 
+[![Backup Visualizer](https://img.shields.io/badge/Live%20Visualizer-Disaster%20Recovery-green?logo=linux)](site/storage.html#backup-section)
+[![Operations Playbook](https://img.shields.io/badge/Playbook-Restore%20Scripts-blue?logo=gnubash)](site/runbook.html)
+
 Complete procedures for creating, inspecting, and restoring homelab backups — covering databases, service configurations, and persistent volumes.
+
+> 🌐 **Interactive Visualizer**: Step-by-step backup and recovery pipeline breakdown is available on the [**Storage & Backups Portal**](site/storage.html#backup-section).
 
 ---
 

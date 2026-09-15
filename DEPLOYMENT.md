@@ -1,6 +1,11 @@
 # 🚀 Homelab Operations & Deployment Runbook
 
+[![DevOps Playbook](https://img.shields.io/badge/Live%20Playbook-Interactive%20Runbook-green?logo=gnubash)](site/runbook.html)
+[![Architecture Portal](https://img.shields.io/badge/Architecture-System%20Map-cyan?logo=docker)](site/index.html)
+
 Full procedures for deploying, managing, backing up, and troubleshooting your homelab.
+
+> 🌐 **Interactive Runbook**: Copy-ready commands and live diagnostics are available on the [**DevOps Operations Playbook**](site/runbook.html).
 
 ---
 

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Storage Architecture &amp; Backups · Homelab Infrastructure</title>
+  <meta name="description" content="Dual-storage tiering strategy (NVMe SSD vs Bulk HDD) and automated nightly 3:00 AM snapshot backup pipeline.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2338bdf8'%3E%3Cpath d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/%3E%3C/svg%3E" type="image/svg+xml">
+  
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Floating Island Navigation -->
+  <header class="floating-nav-wrapper">
+    <nav class="floating-nav" aria-label="Main Navigation">
+      <a href="index.html" class="nav-brand">
+        <span class="brand-indicator" aria-hidden="true"></span>
+        <span>mms.homelab</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Architecture</a></li>
+        <li><a href="services.html" class="nav-link">App Catalog</a></li>
+        <li><a href="resources.html" class="nav-link">Resources</a></li>
+        <li><a href="runbook.html" class="nav-link">Playbook</a></li>
+      </ul>
+
+      <button class="nav-search-btn" id="nav-search-trigger" aria-label="Open Command Palette (Cmd+K)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <span>Search</span>
+        <kbd>⌘K</kbd>
+      </button>
+
+      <button class="mobile-nav-toggle" id="mobile-nav-toggle" aria-label="Toggle navigation menu">
+        <span></span>
+        <span></span>
+      </button>
+    </nav>
+  </header>
+
+  <!-- Mobile Overlay -->
+  <div class="mobile-menu-overlay" id="mobile-menu-overlay" aria-hidden="true">
+    <a href="index.html">Architecture &amp; System Map</a>
+    <a href="services.html">App Catalog (12 Stacks)</a>
+    <a href="resources.html">Resources &amp; Toolkits</a>
+    <a href="runbook.html">DevOps Playbook</a>
+  </div>
+
+  <main id="main-content">
+    <!-- Storage Strategy Section -->
+    <section class="hero-section" style="padding-bottom: 40px;">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Storage Tiering</span>
+          <h1 class="hero-headline">Dual-Storage Tiering Strategy</h1>
+          <p class="section-subheadline">
+            Workloads are strategically partitioned between fast NVMe SSD storage for low-latency databases and high-capacity magnetic HDD for bulk media and backups.
+          </p>
+        </div>
+
+        <div class="architecture-grid">
+          <!-- Tier 1: SSD -->
+          <div class="tier-card reveal">
+            <div class="tier-header">
+              <div class="tier-title-group">
+                <h3>Tier 1: Fast NVMe SSD Storage</h3>
+                <p>/home/maruf/homelab/volumes</p>
+              </div>
+              <span class="badge badge-ssd">Fast I/O &amp; DBs</span>
+            </div>
+            <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6;">
+              Dedicated to high-frequency transactional database writes, in-memory caches, Git repositories, and application state.
+            </p>
+            <ul class="tier-items">
+              <li class="tier-item">
+                <span class="tier-item-name">Leantime MariaDB 11</span>
+                <span class="tier-item-path">volumes/leantime/mysql</span>
+              </li>
+              <li class="tier-item">
+                <span class="tier-item-name">Maybe PostgreSQL 15 &amp; Redis</span>
+                <span class="tier-item-path">volumes/maybe/{postgres,redis}</span>
+              </li>
+              <li class="tier-item">
+                <span class="tier-item-name">Forgejo Git Repositories</span>
+                <span class="tier-item-path">volumes/forgejo</span>
+              </li>
+              <li class="tier-item">
+                <span class="tier-item-name">Grafana State &amp; Dashboards</span>
+                <span class="tier-item-path">volumes/grafana</span>
+              </li>
+              <li class="tier-item">
+                <span class="tier-item-name">ntfy Pub-Sub Cache &amp; Auth</span>
+                <span class="tier-item-path">volumes/ntfy</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Tier 2: HDD -->
+          <div class="tier-card reveal">
+            <div class="tier-header">
+              <div class="tier-title-group">
+                <h3>Tier 2: Bulk HDD Storage</h3>
+                <p>/home/maruf/MyHDDStorage</p>
+              </div>
+              <span class="badge badge-hdd">Bulk Capacity &amp; Retention</span>
+            </div>
+            <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6;">
+              High-capacity magnetic storage allocated for sequential streaming reads, long-term Prometheus TSDB retention, and nightly backup mirrors.
+            </p>
+            <ul class="tier-items">
+              <li class="tier-item">
+                <span class="tier-item-name">Jellyfin Media Library</span>
+                <span class="tier-item-path">Jellyfin/{Movies, TV, Music, Videos}</span>
+              </li>
+              <li class="tier-item">
+                <span class="tier-item-name">Prometheus Metrics TSDB</span>
+                <span class="tier-item-path">monitoring/prometheus</span>
+              </li>
+              <li class="tier-item">
+                <span class="tier-item-name">Portainer Container State</span>
+                <span class="tier-item-path">docker/volumes/portainer</span>
+              </li>
+              <li class="tier-item">
+                <span class="tier-item-name">qBittorrent Downloads</span>
+                <span class="tier-item-path">downloads/</span>
+              </li>
+              <li class="tier-item">
+                <span class="tier-item-name">Nightly Backup Archives</span>
+                <span class="tier-item-path">backups/homelab_backup_*.tar.gz</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Backup Pipeline Section -->
+    <section id="backup-section" style="padding-top: 40px;">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Disaster Recovery</span>
+          <h2 class="section-headline">Nightly Automated Backup Pipeline</h2>
+          <p class="section-subheadline">
+            Automated snapshot cron executing at 03:00 AM daily. Dumps live databases, archives volumes, mirrors to secondary HDD, and enforces 1-snapshot retention.
+          </p>
+        </div>
+
+        <div class="backup-timeline" id="backup-pipeline-steps">
+          <!-- Rendered by app.js -->
+        </div>
+
+        <!-- Retention Policy Box -->
+        <div class="tier-card" style="margin-top: 40px;">
+          <div class="tier-header">
+            <div class="tier-title-group">
+              <h3>Backup Retention &amp; Recovery Workflow</h3>
+              <p>Cron Cadence: 0 3 * * * /home/maruf/homelab/scripts/backup.sh</p>
+            </div>
+            <span class="badge badge-active">Automated Cron</span>
+          </div>
+          <ul class="tier-items">
+            <li class="tier-item">
+              <span class="tier-item-name">Snapshot Format</span>
+              <span class="tier-item-path">homelab_backup_YYYYMMDD_HHMMSS.tar.gz</span>
+            </li>
+            <li class="tier-item">
+              <span class="tier-item-name">Storage Dual Mirror</span>
+              <span class="tier-item-path">Primary: /home/maruf/homelab/backups/ · Secondary: /home/maruf/MyHDDStorage/backups/</span>
+            </li>
+            <li class="tier-item">
+              <span class="tier-item-name">Interactive Restoration</span>
+              <span class="tier-item-path">Run ./scripts/restore.sh to select an archive and safely unpack databases and volume data.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Command Palette Modal -->
+  <div class="modal-backdrop" id="cmd-modal" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-modal="true">
+      <div class="modal-search-header">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="modal-search-input" class="modal-search-input" placeholder="Type a command, service name, or port...">
+        <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">ESC</span>
+      </div>
+      <ul class="modal-results" id="modal-results">
+        <!-- Rendered by app.js -->
+      </ul>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-meta">
+          <p><strong style="color: #FFFFFF;">Personal Homelab Architecture</strong> · Ubuntu Linux (mms)</p>
+          <p>Dual-Storage NVMe + HDD · Automated Nightly 03:00 AM Cron Snapshots</p>
+        </div>
+        <ul class="footer-links">
+          <li><a href="index.html" class="footer-link">Architecture</a></li>
+          <li><a href="services.html" class="footer-link">App Catalog</a></li>
+          <li><a href="resources.html" class="footer-link">Resources</a></li>
+          <li><a href="runbook.html" class="footer-link">Playbook</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

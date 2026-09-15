@@ -1,8 +1,13 @@
 # 🚀 Essential Open-Source Applications & Developer Workstation Tools
 
+[![Interactive Resources Hub](https://img.shields.io/badge/Live%20Hub-Workstation%20%26%20CLI-purple?logo=safari)](site/resources.html)
+[![Self-Hosted Tools](https://img.shields.io/badge/Server%20Apps-12%20Categories-blue?logo=docker)](RECOMMENDED_TOOLS.md)
+[![Architecture Portal](https://img.shields.io/badge/Architecture-System%20Map-cyan?logo=linux)](site/index.html)
+
 A comprehensive, curated reference guide to premier open-source desktop software, CLI utilities, developer environments, and workstation applications for developers, power users, system administrators, designers, and privacy advocates.
 
-This guide complements [**`RECOMMENDED_TOOLS.md`**](file:///home/maruf/homelab/RECOMMENDED_TOOLS.md) (which covers self-hosted homelab server containers and backends) by focusing on workstation-grade software across Linux, macOS, and Windows.
+> 🌐 **Interactive Toolkit Hub**: Filter workstation tools by tech stack, alternative replacement, and discipline in the [**Live Resources Portal**](site/resources.html).
+> 🧰 **Self-Hosted Server Stacks**: Looking for server containers, database dependencies, and Docker compose stacks? See [**`RECOMMENDED_TOOLS.md`**](RECOMMENDED_TOOLS.md).
 
 ---
 

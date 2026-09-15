@@ -1,63 +1,165 @@
 <p align="center">
-  <img src="assets/homelab_cover.png" alt="My DevOps Homelab Banner" width="100%" />
+  <img src="assets/homelab_cover.png" alt="Personal Homelab Architecture & Infrastructure" width="100%" />
 </p>
 
-# Personal Homelab Architecture & Infrastructure
+# Personal Homelab Architecture & DevOps Infrastructure
 
+[![Live Architecture Portal](https://img.shields.io/badge/Live%20Portal-Interactive%20Architecture-cyan?logo=safari)](site/index.html)
 [![Docker Compose](https://img.shields.io/badge/Docker--Compose-v2.20%2B-blue?logo=docker)](https://docs.docker.com/compose/)
-[![Cloudflare Tunnel](https://img.shields.io/badge/Cloudflare-Tunnel-orange?logo=cloudflare)](https://cloudflare.com)
+[![Cloudflare Zero Trust](https://img.shields.io/badge/Cloudflare-Zero%20Trust%20Tunnel-orange?logo=cloudflare)](https://cloudflare.com)
+[![Backup Pipeline](https://img.shields.io/badge/Backup-Nightly%203AM%20Cron-green?logo=linux)](scripts/backup.sh)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Backup](https://img.shields.io/badge/Backup-Nightly%203AM-green?logo=linux)](scripts/backup.sh)
 
-Production-grade, category-wise modular, self-hosted homelab infrastructure optimized for dual-storage (SSD/HDD) performance, feature toggle orchestration, nightly automated backups, secure ingress via Cloudflare Tunnels, and containerized orchestration across 12 application categories.
+Production-grade, modular self-hosted homelab infrastructure optimized for **dual-tier storage performance (NVMe SSD + Bulk HDD)**, category-wise feature toggles, automated database healthchecks, nightly snapshot disaster recovery, and secure edge ingress via **Cloudflare Zero Trust Tunnels**.
 
 ---
 
-## 📌 Infrastructure Highlights
+## 🌐 Interactive Architecture Portal
 
-- **⚡ Dual Storage Tiering**:
-  - **HDD Storage (`/home/maruf/MyHDDStorage`)**: High-capacity storage for bulk media libraries (`Jellyfin`), container management state (`Portainer`), monitoring data retention, and backup archives.
-  - **SSD Storage (`/home/maruf/homelab/volumes`)**: Fast NVMe storage for database engines (`Leantime MariaDB`, `Maybe Postgres & Redis`), application configs (`Dashy`, `Grafana`), and low-latency services.
-- **🎛️ Category-Wise Feature Toggle System**:
-  - Master feature flags (`ENABLE_<SERVICE>=true/false`) in `.env` control deployment across 12 distinct category compose files under `apps/`.
-- **🌐 Cloudflare Zero Trust Ingress**:
-  - All external traffic routes via outbound-only Cloudflare Tunnels. `cloudflared` runs as a **host systemd service** (`/usr/local/bin/cloudflared`) managed from the [Cloudflare dashboard](https://one.dash.cloudflare.com) — completely independent of Docker.
-- **📊 Comprehensive Monitoring**:
-  - Full observability pipeline: Prometheus → Grafana, Node Exporter (host metrics), cAdvisor (container metrics).
-- **🗄️ DB Healthchecks & Startup Ordering**:
-  - All database-backed services (`leantime`, `maybe`) use `condition: service_healthy` to guarantee DB is ready before the app starts.
-- **💾 Nightly Automated Backups**:
-  - Cron job at **3:00 AM** runs `scripts/backup.sh` — creates a full tar snapshot of all volumes & DB dumps, mirrors to HDD, removes the previous backup, and logs the result.
+Explore the full homelab visually with our high-performance static portal:
+
+- 🏛️ **[Architecture & System Map](site/index.html)** — Dual-storage tiering, ingress topology flowcharts, and live system specs.
+- 📦 **[Application Catalog](site/services.html)** — 36+ containerized stacks across 12 functional domains with status filters.
+- 🛠️ **[Resources & Developer Toolkits](site/resources.html)** — Curated workstation software, modern CLI replacements, and role blueprints.
+- 📖 **[DevOps Operations Playbook](site/runbook.html)** — Copy-ready bash automation, diagnostic snippets, and troubleshooting routines.
+- 🔌 **[Port Matrix Inspector](site/ports.html)** — Collision-free host port bindings and bridge isolation verification.
+- 💾 **[Storage & Backups Visualizer](site/storage.html)** — Detailed mount allocations and step-by-step backup pipeline breakdown.
+
+---
+
+## 🏗️ Homelab Architecture A-Z
+
+### 1. Ingress & Zero Trust Network Topology
+
+```mermaid
+flowchart TD
+    subgraph Public["Public Internet & Edge Network"]
+        Client["Remote Clients & Devices"]
+        CF["Cloudflare Edge Proxy / WAF / SSL Termination"]
+    end
+
+    subgraph Host["Homelab Node (Ubuntu Linux · mms · 192.168.1.75)"]
+        CFT["cloudflared (Host systemd daemon)\n4 persistent outbound QUIC links\nZero Inbound Router Ports"]
+        
+        subgraph Net["Isolated Docker Bridge: homelab"]
+            direction TB
+            
+            subgraph Fin["Finance & Productivity"]
+                MAY["Maybe Finance (8092)"]
+                MAY_DB[("PostgreSQL 15 + Redis\n(Internal Only)")]
+                LEAN["Leantime (8090)"]
+                LEAN_DB[("MariaDB 11\n(Internal Only)")]
+                NOTE["Memos (5230) · Vikunja (3456) · Stirling PDF (8084)"]
+            end
+            
+            subgraph Sys["Sysadmin & Monitoring"]
+                FORG["Forgejo Git (3000/2222)"]
+                NTFY["ntfy Alerts (8088)"]
+                ITT["IT-Tools (8091)"]
+                PROM["Prometheus (9093)"]
+                GRAF["Grafana (3005)"]
+                SCRUT["Scrutiny S.M.A.R.T. (8089)"]
+            end
+            
+            subgraph Media["Media Streaming"]
+                JEL["Jellyfin Media (8096)"]
+                ARR["Sonarr / Radarr / Prowlarr / Navidrome"]
+            end
+        end
+    end
+
+    Client --> CF
+    CF <==>|Encrypted Outbound Tunnel| CFT
+    CFT -->|Internal Route| FORG
+    CFT -->|Internal Route| NTFY
+    CFT -->|Internal Route| SCRUT
+    CFT -->|Internal Route| JEL
+    CFT -->|Internal Route| MAY
+    CFT -->|Internal Route| LEAN
+    CFT -->|Internal Route| GRAF
+    CFT -->|Internal Route| ARR
+
+    MAY -.->|Healthy Check| MAY_DB
+    LEAN -.->|Healthy Check| LEAN_DB
+```
+
+---
+
+### 2. Smart Dual-Tier Storage Architecture
+
+```mermaid
+flowchart LR
+    Node["Homelab Host Server (mms)"]
+
+    subgraph SSD["Tier 1: Fast NVMe SSD (/volumes)"]
+        SSD_DB["Transactional DBs (MariaDB, PostgreSQL, Redis)"]
+        SSD_GIT["Git Repositories (Forgejo)"]
+        SSD_CONF["Application State & SQLite Caches (Grafana, Memos)"]
+    end
+
+    subgraph HDD["Tier 2: Bulk HDD Bay (/MyHDDStorage)"]
+        HDD_MEDIA["Jellyfin Media Libraries (Movies, TV, Music, Videos)"]
+        HDD_TSDB["Prometheus TSDB Long-Term Retention"]
+        HDD_STATE["Portainer & Monitoring History"]
+        HDD_BAK["Automated Nightly Backup Archives (.tar.gz)"]
+    end
+
+    Node --> SSD
+    Node --> HDD
+```
+
+---
+
+### 3. Automated Disaster Recovery Pipeline (03:00 AM Cron)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Cron as Cron (03:00 AM)
+    participant Script as scripts/backup.sh
+    participant MariaDB as Leantime DB
+    participant Postgres as Maybe DB
+    participant SSD as SSD Volumes
+    participant HDD as HDD Storage Bay
+
+    Cron->>Script: Trigger Nightly Backup
+    Script->>MariaDB: Consistent mariadb-dump
+    Script->>Postgres: pg_dump transactional snapshot
+    Script->>SSD: Read-only tar snapshot of /volumes
+    Script->>Script: Package into master homelab_backup_*.tar.gz
+    Script->>HDD: Mirror master snapshot to /MyHDDStorage/backups/
+    Script->>HDD: Purge previous archives (1 master retention)
+    Script-->>Cron: Log result to backups/backup.log
+```
 
 ---
 
 ## 🧰 Active Services & Storage Allocation
 
-| Service | Category | Host Port | Storage | Description |
+| Service | Category | Host Port | Storage Tier | Description |
 | :--- | :--- | :---: | :---: | :--- |
-| **Cloudflare Tunnel** | 4: Network | Outbound only | Host daemon | Systemd service — managed via Cloudflare dashboard |
-| **Portainer** | 10: Sysadmin | `9000`, `9443` | HDD | Docker stack & container management |
-| **IT-Tools** | 10: Sysadmin | `8091` | Stateless | Developer & sysadmin utilities |
-| **Forgejo** | 10: Sysadmin | `3000` (HTTP), `2222` (SSH) | SSD | Lightweight self-hosted Git service |
-| **ntfy** | 10: Sysadmin | `8088` | SSD | HTTP-based pub-sub push notification service |
-| **Scrutiny** | 5: Monitoring | `8089` | SSD | Hard drive S.M.A.R.T. health & metrics dashboard |
-| **Maybe Finance** | 2: Finance | `8092` | SSD | Personal finance & net worth tracker |
-| **Maybe Postgres** | 2: Finance | `5432` (internal) | SSD | PostgreSQL backend for Maybe |
-| **Leantime** | 8: Productivity | `8090` | SSD | Lean project management platform |
-| **Leantime MariaDB** | 8: Productivity | `3306` (internal) | SSD | MariaDB 11 backend for Leantime |
-| **ChangeDetection** | 8: Productivity | `5001` | SSD | Website change monitoring |
-| **Stirling PDF** | 8: Productivity | `8084` | Stateless | Self-hosted PDF toolbox |
-| **Memos** | 8: Productivity | `5230` | SSD | Lightweight note-taking |
-| **Vikunja** | 8: Productivity | `3456` | SSD | Open-source task manager |
-| **Jellyfin** | 1: Media | `8096` | HDD | Self-hosted media streaming server |
-| **Sonarr / Radarr / Lidarr** | 1: Media | `8989 / 7878 / 8686` | SSD + HDD | Arr media automation suite |
-| **Prowlarr** | 1: Media | `9696` | SSD | Indexer manager for Arr suite |
-| **qBittorrent** | 1: Media | `8087` | HDD | Torrent download client |
-| **Navidrome** | 1: Media | `4533` | SSD + HDD | Music streaming server |
-| **Prometheus** | 5: Monitoring | `9093` | SSD + HDD | Time-series metrics collector |
-| **Grafana** | 5: Monitoring | `3005` | SSD | Metrics visualization & dashboards |
-| **Node Exporter** | 5: Monitoring | `9100` (internal) | Host | Host hardware & OS metrics |
-| **cAdvisor** | 5: Monitoring | `8083` | Host | Container resource usage metrics |
+| **Cloudflare Tunnel** | Network & Ingress | Outbound only | Host Daemon | Systemd service (`cloudflared`) managed via Cloudflare Zero Trust |
+| **Portainer** | Sysadmin & DevOps | `9000`, `9443` | HDD | Container management & orchestration UI |
+| **IT-Tools** | Sysadmin & DevOps | `8091` | Stateless | Developer toolbox with 50+ utilities |
+| **Forgejo** | Sysadmin & DevOps | `3000` (HTTP), `2222` (SSH) | SSD | Lightweight self-hosted Git server |
+| **ntfy** | Sysadmin & DevOps | `8088` | SSD | Simple HTTP-based pub-sub push notification service |
+| **Scrutiny** | Monitoring | `8089` | SSD | Hard drive S.M.A.R.T. metrics collector & web UI |
+| **Maybe Finance** | Finance & Wealth | `8092` | SSD | Personal finance and wealth tracking platform |
+| **Maybe Postgres** | Finance & Wealth | `5432` (Internal) | SSD | Dedicated PostgreSQL 15 database instance |
+| **Leantime** | Productivity | `8090` | SSD | Agile project management and strategy workspace |
+| **Leantime MariaDB** | Productivity | `3306` (Internal) | SSD | MariaDB 11 transactional storage engine |
+| **ChangeDetection** | Productivity | `5001` | SSD | Real-time web page monitoring and diff alerting |
+| **Stirling PDF** | Productivity | `8084` | Stateless | Robust local PDF manipulation toolbox |
+| **Memos** | Productivity | `5230` | SSD | Privacy-first lightweight note-taking service |
+| **Vikunja** | Productivity | `3456` | SSD | Open-source to-do and task management app |
+| **Jellyfin** | Media & Streaming | `8096` | HDD | High-performance open-source media streaming server |
+| **Arr Suite** | Media & Streaming | `8989`, `7878`, `9696` | SSD + HDD | Sonarr, Radarr, Prowlarr media management stack |
+| **qBittorrent** | Media & Streaming | `8087` | HDD | Fast BitTorrent client with Web UI |
+| **Navidrome** | Media & Streaming | `4533` | SSD + HDD | Subsonic-compatible personal music streaming server |
+| **Prometheus** | Monitoring | `9093` | SSD + HDD | High-throughput time-series metrics database |
+| **Grafana** | Monitoring | `3005` | SSD | Telemetry visualization dashboards |
+| **Node Exporter** | Monitoring | `9100` (Internal) | Host Daemon | Host OS and hardware metrics exporter |
+| **cAdvisor** | Monitoring | `8083` | Host Runtime | Container resource utilization collector |
 
 ---
 
@@ -65,103 +167,127 @@ Production-grade, category-wise modular, self-hosted homelab infrastructure opti
 
 ```
 /home/maruf/homelab/
-├── .env.example                  # Environment template — copy to .env & configure
-├── .env                          # Active environment (gitignored — never commit)
-├── .gitignore                    # Protects secrets, volumes, and backup archives
-├── README.md                     # This file — architecture overview & quick start
-├── DEPLOYMENT.md                 # Full ops runbook: deploy, update, troubleshoot
-├── BACKUP_AND_RESTORE_GUIDE.md   # Backup & restore procedures, cron setup
-├── SECURITY.md                   # Security best practices & hardening guide
-├── RECOMMENDED_TOOLS.md          # 12-category self-hosted tools catalog
-├── RECOMMENDED_OPEN_SOURCE_APPS.md # Open-source apps & dev tools catalog (14 categories)
-├── docker-compose.yml            # Master compose file (uses 'include' directive)
-├── apps/                         # 12 Category-Wise Application Stacks
+├── .github/workflows/deploy-pages.yml # Automatic GitHub Pages deployment workflow
+├── .env.example                  # Environment template with feature toggle switches
+├── .env                          # Active environment (gitignored — never committed)
+├── .gitignore                    # Comprehensive secrets and volume protection
+├── README.md                     # This file — master overview, diagrams, and quickstart
+├── ARCHITECTURE.md               # In-depth architectural & storage design specification
+├── DEPLOYMENT.md                 # Complete ops runbook: deploy, update, troubleshooting
+├── BACKUP_AND_RESTORE_GUIDE.md   # Disaster recovery, cron automation, and restore steps
+├── SECURITY.md                   # Threat model, secret management, and hardening guide
+├── RECOMMENDED_TOOLS.md          # 12-category self-hosted server application catalog
+├── RECOMMENDED_OPEN_SOURCE_APPS.md # 14-category workstation and CLI developer toolkit
+├── docker-compose.yml            # Master compose file using Docker Compose v2.20+ include
+├── index.html                    # Root forwarder to interactive portal
+├── site/                         # Interactive static architecture & catalog portal
+│   ├── index.html                # Architecture & System Map
+│   ├── services.html             # Application Catalog & Stacks
+│   ├── resources.html            # Workstation Toolkits & Role Blueprints
+│   ├── runbook.html              # DevOps Operations Playbook
+│   ├── ports.html                # Port Matrix & Network Security
+│   ├── storage.html              # Storage Tiering & Backup Pipeline
+│   ├── css/                      # Design system tokens, layouts & components
+│   ├── js/                       # Live data catalog & search controller
+│   └── assets/                   # Architecture visuals & branded covers
+├── apps/                         # 12 Category-Wise Modular Stacks
 │   ├── media/                    # Category 1: Media (Jellyfin, Sonarr, Radarr…)
 │   ├── finance/                  # Category 2: Finance (Maybe + Postgres + Redis)
 │   ├── dashboards/               # Category 3: Dashboards (Dashy, Homepage, Glance)
 │   ├── network/                  # Category 4: Network & Ingress (cloudflared)
 │   ├── monitoring/               # Category 5: Observability (Prometheus, Grafana…)
-│   ├── storage/                  # Category 6: Storage & Cloud (placeholder)
-│   ├── security/                 # Category 7: Security & Auth (placeholder)
+│   ├── storage/                  # Category 6: Storage & Cloud
+│   ├── security/                 # Category 7: Security & Auth
 │   ├── productivity/             # Category 8: Productivity (Leantime, ChangeDetection…)
-│   ├── automation/               # Category 9: Home Automation (placeholder)
-│   ├── sysadmin/                 # Category 10: Sysadmin (Portainer, IT-Tools)
-│   ├── ai/                       # Category 11: Local AI (placeholder)
-│   └── workflows/                # Category 12: Workflows (placeholder)
+│   ├── automation/               # Category 9: Home Automation & IoT
+│   ├── sysadmin/                 # Category 10: Sysadmin (Portainer, IT-Tools, Forgejo)
+│   ├── ai/                       # Category 11: Local AI & LLM Hub
+│   └── workflows/                # Category 12: Workflows & Integrations
 ├── scripts/
-│   ├── init-homelab.sh           # First-run: creates Docker network & volume dirs
+│   ├── init-homelab.sh           # First-run: creates Docker network & volume directories
 │   ├── deploy.sh                 # Category deployer with port collision validation
-│   ├── backup.sh                 # Full snapshot backup + HDD mirror + retention
-│   └── restore.sh                # Guided restore from backup archive
-├── backups/                      # Local backup archives (gitignored)
-│   └── README.md                 # Backup directory notes
-└── volumes/                      # SSD persistent volume mount targets (gitignored)
+│   ├── backup.sh                 # Automated database dumps + snapshot mirroring
+│   └── restore.sh                # Interactive step-by-step disaster recovery script
+└── volumes/                      # SSD persistent mount targets (gitignored)
 ```
 
 ---
 
 ## ⚡ Quick Start
 
-### 1. Clone & Initialize
+### 1. Initialize Environment
 ```bash
 git clone https://github.com/maruf-pfc/homelab.git /home/maruf/homelab
 cd /home/maruf/homelab
 cp .env.example .env
-nano .env           # Set passwords, paths, and feature toggles
+nano .env           # Configure secure passwords and storage paths
 ./scripts/init-homelab.sh
 ```
 
-### 2. Enable Services
-In `.env`, set `ENABLE_<SERVICE>=true` for each service you want to run:
+### 2. Enable Required Categories & Services
+In `.env`, toggle the services you wish to activate:
 ```bash
 ENABLE_LEANTIME=true
 ENABLE_MAYBE=true
 ENABLE_CHANGEDETECTION=true
 ENABLE_GRAFANA=true
+ENABLE_JELLYFIN=true
 ```
 
-### 3. Deploy
+### 3. Deploy Stacks
 ```bash
 ./scripts/deploy.sh
 ```
 
-### 4. Verify
+### 4. Verify Active Workloads
 ```bash
 docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 ```
 
 ---
 
-## 💾 Backup & Restore
+## 💾 Automated Backup & Recovery
 
-Nightly automated backup runs at **3:00 AM** via cron:
-```
+Nightly automated snapshot runs at **03:00 AM** via cron:
+```cron
 0 3 * * * /home/maruf/homelab/scripts/backup.sh >> /home/maruf/homelab/backups/backup.log 2>&1
 ```
 
-- **Snapshot**: Full tar archive of all volumes + DB dumps
-- **Mirror**: Auto-copied to `/home/maruf/MyHDDStorage/backups/`
-- **Retention**: Keeps only the **most recent** backup — older archives deleted automatically
+- **Transactional DB Snapshots**: Live dumps of MariaDB and PostgreSQL backends.
+- **SSD Volume Tar**: Read-only atomic compression of `/home/maruf/homelab/volumes`.
+- **Secondary HDD Mirror**: Mirrored to `/home/maruf/MyHDDStorage/backups/`.
+- **Single Master Retention**: Keeps only the most recent clean archive to conserve storage.
 
-Manual backup:
+To run a manual on-demand backup:
 ```bash
 ./scripts/backup.sh
 ```
 
-See [BACKUP_AND_RESTORE_GUIDE.md](BACKUP_AND_RESTORE_GUIDE.md) for full restore procedures.
+For guided restoration, see [BACKUP_AND_RESTORE_GUIDE.md](BACKUP_AND_RESTORE_GUIDE.md).
 
 ---
 
-## 🔒 Security Model
+## 🔒 Security & Privacy Model
 
-- All secrets live in `.env` only — never committed to git (enforced by `.gitignore`)
-- All default passwords have been **replaced with strong randomly-generated secrets**
-- External traffic routed exclusively via Cloudflare Zero Trust Tunnels — no exposed host ports
-- DB containers use **healthchecks** (`mariadb-admin ping`, `pg_isready`) to ensure service readiness before app containers start
-- See [SECURITY.md](SECURITY.md) for hardening guide
+- **Zero Host Inbound Ports**: All external routing is mediated through Cloudflare Zero Trust Tunnels.
+- **Network Isolation**: Databases reside strictly on internal Docker networks without exposed host ports.
+- **Secret Isolation**: Secrets reside solely in `.env` (gitignored).
+- **Readiness Probes**: Database dependencies utilize `condition: service_healthy` to prevent premature app starts.
+- For complete details, see [SECURITY.md](SECURITY.md).
 
 ---
 
-## 📄 License
+## 📄 Documentation Reference
 
-[MIT](LICENSE) — © Maruf
+- 🏛️ [**`ARCHITECTURE.md`**](ARCHITECTURE.md) — Comprehensive technical design & storage blueprint
+- 🚀 [**`DEPLOYMENT.md`**](DEPLOYMENT.md) — Production operations & troubleshooting runbook
+- 💾 [**`BACKUP_AND_RESTORE_GUIDE.md`**](BACKUP_AND_RESTORE_GUIDE.md) — Disaster recovery & snapshot restoration
+- 🔒 [**`SECURITY.md`**](SECURITY.md) — Security model & system hardening
+- 🧰 [**`RECOMMENDED_TOOLS.md`**](RECOMMENDED_TOOLS.md) — 12-category self-hosted server application catalog
+- 💻 [**`RECOMMENDED_OPEN_SOURCE_APPS.md`**](RECOMMENDED_OPEN_SOURCE_APPS.md) — 14-category workstation & CLI developer toolkit
+
+---
+
+## 📜 License
+
+[MIT License](LICENSE) — © Maruf
