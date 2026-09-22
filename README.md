@@ -57,7 +57,7 @@ flowchart TD
             end
             
             subgraph Sys["Sysadmin & Monitoring"]
-                FORG["Forgejo Git (3000/2222)"]
+                FORG["Forgejo Git (3003/2222)"]
                 NTFY["ntfy Alerts (8088)"]
                 ITT["IT-Tools (8091)"]
                 PROM["Prometheus (9093)"]
@@ -161,7 +161,7 @@ sequenceDiagram
 | **Cloudflare Tunnel** | Network & Ingress | Outbound only | Host Daemon | Systemd service (`cloudflared`) managed via Cloudflare Zero Trust |
 | **Portainer** | Sysadmin & DevOps | `9000`, `9443` | HDD | Container management & orchestration UI |
 | **IT-Tools** | Sysadmin & DevOps | `8091` | Stateless | Developer toolbox with 50+ utilities |
-| **Forgejo** | Sysadmin & DevOps | `3000` (HTTP), `2222` (SSH) | SSD | Lightweight self-hosted Git server |
+| **Forgejo** | Sysadmin & DevOps | `3003` (HTTP), `2222` (SSH) | SSD | Lightweight self-hosted Git server |
 | **ntfy** | Sysadmin & DevOps | `8088` | SSD | Simple HTTP-based pub-sub push notification service |
 | **Scrutiny** | Monitoring | `8089` | SSD | Hard drive S.M.A.R.T. metrics collector & web UI |
 | **Maybe Finance** | Finance & Wealth | `8092` | SSD | Personal finance and wealth tracking platform |

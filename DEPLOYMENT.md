@@ -148,7 +148,7 @@ tail -f /home/maruf/homelab/backups/backup.log
 | :--- | :---: |
 | Portainer | `9000`, `9443` |
 | Uptime Kuma | `3001` |
-| Forgejo | `3000` (HTTP), `2222` (SSH) |
+| Forgejo | `3003` (HTTP), `2222` (SSH) |
 | ntfy | `8088` |
 | Scrutiny | `8089` |
 | Dashy | `7575` |

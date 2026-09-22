@@ -46,7 +46,7 @@ services:
       - FORGEJO__server__ROOT_URL=${FORGEJO_URL:-https://forgejo.baaankai.dpdns.org}
       - FORGEJO__service__DISABLE_REGISTRATION=${FORGEJO_DISABLE_REGISTRATION:-false}
     ports:
-      - "${FORGEJO_HTTP_PORT:-3000}:3000"
+      - "${FORGEJO_HTTP_PORT:-3003}:3000"
       - "${FORGEJO_SSH_PORT:-2222}:22"
     volumes:
       - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/forgejo:/data

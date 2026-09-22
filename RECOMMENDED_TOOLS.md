@@ -199,7 +199,7 @@ A comprehensive, categorized reference guide to popular open-source and self-hos
 | :--- | :--- | :---: | :---: | :--- | :--- | :--- |
 | **Portainer** | Container Manager | `9000` | ⚡ Ultra-Light | GUI tool for managing Docker containers, stacks, volumes, and networks. *(Active)* | `Go / Angular` / `BoltDB` | SSD |
 | **Dockge** | Docker Stack Manager | `5001` | ⚡ Ultra-Light | Reactive, clean Docker Compose stack manager created by the author of Uptime Kuma. | `Node.js / Vue` / `YAML Compose Files` | SSD |
-| **Forgejo / Gitea** | Git Server | `3000` | 🟢 Lightweight | Lightweight, fast self-hosted Git service (GitHub/GitLab alternative). *(Active in homelab)* | `Go / React` / `SQLite / PostgreSQL` | SSD |
+| **Forgejo / Gitea** | Git Server | `3003` | 🟢 Lightweight | Lightweight, fast self-hosted Git service (GitHub/GitLab alternative). *(Active in homelab)* | `Go / React` / `SQLite / PostgreSQL` | SSD |
 | **Woodpecker CI** | CI/CD Engine | `8000` | 🟢 Lightweight | Simple, container-based CI/CD engine that integrates with Forgejo/Gitea. | `Go / Vue` / `SQLite / Postgres` | SSD |
 | **IT-Tools** | Admin Utilities | `8091` | ⚡ Ultra-Light | Handy online tools for developers and sysadmins. *(Active in homelab)* | `Vue.js (Client-side JS)` / `Stateless (No DB)` | Stateless |
 | **Watchtower** | Auto-Updater | Background | ⚡ Ultra-Light | Automatically updates running Docker containers when new images are published. | `Go` / `Stateless` | Stateless |

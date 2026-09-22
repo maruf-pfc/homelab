@@ -93,7 +93,7 @@ const HOMELAB_DATA = {
       name: "Forgejo Git",
       category: "sysadmin",
       status: "active",
-      hostPort: "3000 (HTTP), 2222 (SSH)",
+      hostPort: "3003 (HTTP), 2222 (SSH)",
       internalPort: "3000, 22",
       storageTier: "SSD",
       storagePath: "/home/maruf/homelab/volumes/forgejo",
@@ -694,7 +694,7 @@ const HOMELAB_DATA = {
   ],
 
   portMatrix: [
-    { port: "3000", service: "Forgejo (Git Web)", type: "TCP", access: "LAN / Cloudflare", internal: "3000" },
+    { port: "3003", service: "Forgejo (Git Web)", type: "TCP", access: "LAN / Cloudflare", internal: "3000" },
     { port: "2222", service: "Forgejo (Git SSH)", type: "TCP", access: "LAN / SSH Direct", internal: "22" },
     { port: "3005", service: "Grafana (Observability)", type: "TCP", access: "LAN / Cloudflare", internal: "3000" },
     { port: "8083", service: "cAdvisor (Container Metrics)", type: "TCP", access: "LAN Only", internal: "8080" },

@@ -28,7 +28,7 @@ flowchart TD
             end
             
             subgraph Sys["Sysadmin & Git Forge"]
-                FORG["Forgejo Git Server (Port 3000)"]
+                FORG["Forgejo Git Server (Port 3003)"]
                 NTFY["ntfy Push Alerts (Port 8088)"]
                 ITT["IT-Tools (Port 8091)"]
             end
