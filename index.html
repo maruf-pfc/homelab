@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Homelab Infrastructure &amp; Service Architecture</title>
+  <meta name="description" content="Production-grade, modular, self-hosted homelab infrastructure featuring dual-storage tiering, Cloudflare Zero Trust ingress, automated backups, and 12 containerized service stacks.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2338bdf8'%3E%3Cpath d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/%3E%3C/svg%3E" type="image/svg+xml">
+  
+  <!-- Modern Fonts & Styles -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Floating Island Navigation -->
+  <header class="floating-nav-wrapper">
+    <nav class="floating-nav" aria-label="Main Navigation">
+      <a href="index.html" class="nav-brand">
+        <span class="brand-indicator" aria-hidden="true"></span>
+        <span>mms.homelab</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link active">Architecture</a></li>
+        <li><a href="services.html" class="nav-link">App Catalog</a></li>
+        <li><a href="resources.html" class="nav-link">Resources</a></li>
+        <li><a href="runbook.html" class="nav-link">Playbook</a></li>
+      </ul>
+
+      <button class="nav-search-btn" id="nav-search-trigger" aria-label="Open Command Palette (Cmd+K)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <span>Search</span>
+        <kbd>⌘K</kbd>
+      </button>
+
+      <button class="mobile-nav-toggle" id="mobile-nav-toggle" aria-label="Toggle navigation menu">
+        <span></span>
+        <span></span>
+      </button>
+    </nav>
+  </header>
+
+  <!-- Fullscreen Mobile Navigation Menu -->
+  <div class="mobile-menu-overlay" id="mobile-menu-overlay" aria-hidden="true">
+    <a href="index.html">Architecture &amp; System Map</a>
+    <a href="services.html">App Catalog (12 Stacks)</a>
+    <a href="resources.html">Resources &amp; Toolkits</a>
+    <a href="runbook.html">DevOps Playbook</a>
+  </div>
+
+  <main id="main-content">
+    <!-- Hero Showcase (2-Column Modern Layout) -->
+    <section id="hero" class="hero-section">
+      <div class="container">
+        <div class="hero-grid">
+          <!-- Left Column: Copy & Actions -->
+          <div class="hero-left">
+            <div class="hero-pill">
+              <span class="brand-indicator" aria-hidden="true"></span>
+              <span>Live Node: Ubuntu Linux (mms)</span>
+            </div>
+
+            <h1 class="hero-headline">
+              Personal Homelab &amp;<br>
+              <span class="hero-headline-gradient">DevOps Infrastructure</span>
+            </h1>
+
+            <p class="hero-description">
+              Production-grade, category-wise modular self-hosted infrastructure optimized for dual-storage tiering, automated database healthchecks, nightly snapshot replication, and Cloudflare Zero Trust ingress.
+            </p>
+
+            <div class="hero-actions">
+              <a href="services.html" class="btn btn-primary">
+                Explore Services (36 Stacks)
+              </a>
+              <a href="#topology" class="btn btn-secondary">
+                View Topology
+              </a>
+              <a href="runbook.html" class="btn btn-secondary">
+                Ops Runbook
+              </a>
+            </div>
+
+            <!-- Host Specs Sub-Row -->
+            <div class="hero-specs-row">
+              <div class="spec-item">
+                <span class="spec-label">Domain</span>
+                <span class="spec-value">baaankai.dpdns.org</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-label">Internal IP</span>
+                <span class="spec-value">192.168.1.75</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-label">Snapshot Cron</span>
+                <span class="spec-value">03:00 AM Daily</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-label">Security</span>
+                <span class="spec-value">Zero Inbound Ports</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: 3D Infrastructure Visualizer Card -->
+          <div class="hero-right">
+            <div class="hero-visual-frame">
+              <div class="frame-header">
+                <div class="frame-dots">
+                  <span class="frame-dot"></span>
+                  <span class="frame-dot"></span>
+                  <span class="frame-dot"></span>
+                </div>
+                <span class="frame-title">datacenter_node_01.live</span>
+                <span class="badge badge-active" style="font-size: 0.6875rem;">Online</span>
+              </div>
+
+              <img src="assets/homelab_cover.png" alt="DevOps Homelab Architecture Node Visualizer" class="hero-cover-img" loading="eager">
+
+              <div class="frame-footer">
+                <span>Storage: NVMe SSD + High-Capacity HDD</span>
+                <span style="font-family: var(--font-mono); color: var(--accent-cyan);">cloudflared: 4 QUIC Links</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Stats Grid -->
+        <div class="stats-grid">
+          <a href="services.html" class="stat-card" style="text-decoration: none;">
+            <div class="stat-header">
+              <span class="stat-label">Active Workloads</span>
+              <div class="stat-icon-box">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-emerald)" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+              </div>
+            </div>
+            <div class="stat-value tabular-nums" id="stat-active-services">15</div>
+            <div class="stat-desc">Containers running with automated healthchecks →</div>
+          </a>
+
+          <a href="services.html" class="stat-card" style="text-decoration: none;">
+            <div class="stat-header">
+              <span class="stat-label">Service Catalog</span>
+              <div class="stat-icon-box">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+              </div>
+            </div>
+            <div class="stat-value tabular-nums" id="stat-total-catalog">36</div>
+            <div class="stat-desc">Preconfigured compose stacks across 12 categories →</div>
+          </a>
+
+          <a href="ports.html" class="stat-card" style="text-decoration: none;">
+            <div class="stat-header">
+              <span class="stat-label">Mapped Port Allocations</span>
+              <div class="stat-icon-box">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-amber)" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+              </div>
+            </div>
+            <div class="stat-value tabular-nums" id="stat-total-ports">18</div>
+            <div class="stat-desc">Collision-free host port bindings &amp; isolated bridges →</div>
+          </a>
+
+          <a href="resources.html" class="stat-card" style="text-decoration: none;">
+            <div class="stat-header">
+              <span class="stat-label">Resources &amp; Toolkits</span>
+              <div class="stat-icon-box">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-primary)" stroke-width="2"><path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"></path></svg>
+              </div>
+            </div>
+            <div class="stat-value tabular-nums" id="stat-total-workstation">36</div>
+            <div class="stat-desc">Curated desktop apps, CLI tools &amp; role blueprints →</div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Storage Tiering Overview -->
+    <section id="storage-tiering">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Storage Strategy</span>
+          <h2 class="section-headline">Dual-Storage Tiering Architecture</h2>
+          <p class="section-subheadline">
+            Workloads are strategically partitioned between fast NVMe SSD storage for low-latency databases and high-capacity magnetic HDD for bulk media and backups.
+          </p>
+        </div>
+
+        <div class="architecture-grid">
+          <!-- Tier 1: SSD -->
+          <div class="tier-card reveal">
+            <div class="tier-header">
+              <div class="tier-title-group">
+                <h3>Tier 1: Fast NVMe SSD Storage</h3>
+                <p>/home/maruf/homelab/volumes</p>
+              </div>
+              <span class="badge badge-ssd">Fast I/O &amp; DBs</span>
+            </div>
+            <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6;">
+              Dedicated to high-frequency transactional database writes, in-memory caches, Git repositories, and application state.
+            </p>
+            <ul class="tier-items">
+              <li class="tier-item">
+                <span class="tier-item-name">Leantime MariaDB 11</span>
+                <span class="tier-item-path">volumes/leantime/mysql</span>
+              </li>
+              <li class="tier-item">
+                <span class="tier-item-name">Maybe PostgreSQL 15 &amp; Redis</span>
+                <span class="tier-item-path">volumes/maybe/{postgres,redis}</span>
+              </li>
+              <li class="tier-item">
+                <span class="tier-item-name">Forgejo Git Repositories</span>
+                <span class="tier-item-path">volumes/forgejo</span>
+              </li>
+            </ul>
+            <div style="margin-top: 8px;">
+              <a href="storage.html" class="btn btn-secondary btn-sm">View Full Storage &amp; Backups Details →</a>
+            </div>
+          </div>
+
+          <!-- Tier 2: HDD -->
+          <div class="tier-card reveal">
+            <div class="tier-header">
+              <div class="tier-title-group">
+                <h3>Tier 2: Bulk HDD Storage</h3>
+                <p>/home/maruf/MyHDDStorage</p>
+              </div>
+              <span class="badge badge-hdd">Bulk Capacity &amp; Retention</span>
+            </div>
+            <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6;">
+              High-capacity magnetic storage allocated for sequential streaming reads, long-term Prometheus TSDB retention, and nightly backup mirrors.
+            </p>
+            <ul class="tier-items">
+              <li class="tier-item">
+                <span class="tier-item-name">Jellyfin Media Library</span>
+                <span class="tier-item-path">Jellyfin/{Movies, TV, Music, Videos}</span>
+              </li>
+              <li class="tier-item">
+                <span class="tier-item-name">Prometheus Metrics TSDB</span>
+                <span class="tier-item-path">monitoring/prometheus</span>
+              </li>
+              <li class="tier-item">
+                <span class="tier-item-name">Nightly Backup Archives</span>
+                <span class="tier-item-path">backups/homelab_backup_*.tar.gz</span>
+              </li>
+            </ul>
+            <div style="margin-top: 8px;">
+              <a href="storage.html#backup-section" class="btn btn-secondary btn-sm">Explore 03:00 AM Backup Pipeline →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Architecture Diagrams & System Map -->
+    <section id="diagrams">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Interactive Diagrams</span>
+          <h2 class="section-headline">Homelab Architecture A-Z Visualizer</h2>
+          <p class="section-subheadline">
+            Explore interactive visual flowcharts detailing Zero Trust edge ingress, smart dual-tier storage mounts, nightly automated snapshot recovery, and the complete system blueprint.
+          </p>
+        </div>
+
+        <div class="diagram-wrapper reveal">
+          <div class="diagram-header-bar">
+            <div class="diagram-tabs" id="diagram-tab-nav">
+              <button class="diagram-tab-btn active" data-diagram="ingress">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                <span>Zero Trust Ingress</span>
+              </button>
+              <button class="diagram-tab-btn" data-diagram="storage">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+                <span>Dual-Storage Engine</span>
+              </button>
+              <button class="diagram-tab-btn" data-diagram="backup">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <span>03:00 AM Disaster Recovery</span>
+              </button>
+              <button class="diagram-tab-btn" data-diagram="blueprint">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                <span>System Blueprint Graph</span>
+              </button>
+            </div>
+
+            <div style="font-size: 0.75rem; font-family: var(--font-mono); color: var(--accent-cyan);">
+              Status: Live &amp; Isolated
+            </div>
+          </div>
+
+          <!-- Diagram 1: Zero Trust Ingress -->
+          <div class="diagram-view-pane active" id="pane-ingress">
+            <div style="margin-bottom: 24px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-medium); box-shadow: 0 8px 32px rgba(0,0,0,0.4);">
+              <img src="assets/ingress_topology_diagram.png" alt="Zero Trust Edge Ingress Architecture Diagram" style="width: 100%; height: auto; display: block; border-radius: 12px;">
+            </div>
+            <div class="visual-canvas">
+              <div class="ingress-pipeline-grid">
+                <!-- Node 1: Public Client -->
+                <div class="diagram-node-card">
+                  <div class="node-card-header">
+                    <span class="node-card-title">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                      External Clients
+                    </span>
+                    <span class="badge badge-active" style="font-size: 0.6875rem;">HTTPS</span>
+                  </div>
+                  <p class="node-card-desc">Users and automated clients connecting via public DNS domains over strict TLS.</p>
+                  <div class="node-subitems">
+                    <div class="node-subitem">
+                      <span class="node-subitem-name">Public DNS</span>
+                      <span class="node-subitem-port">baaankai.dpdns.org</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Connector 1 -->
+                <div class="diagram-connector">
+                  <span class="connector-tag">TLS 1.3 / WAF</span>
+                  <div class="connector-line"><span class="connector-pulse"></span></div>
+                </div>
+
+                <!-- Node 2: Cloudflare Edge -->
+                <div class="diagram-node-card">
+                  <div class="node-card-header">
+                    <span class="node-card-title">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-amber)" stroke-width="2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>
+                      Cloudflare Edge
+                    </span>
+                    <span class="badge badge-amber" style="font-size: 0.6875rem;">Edge Proxy</span>
+                  </div>
+                  <p class="node-card-desc">Zero Trust Access authentication, DDoS mitigation, and outbound tunnel encapsulation.</p>
+                  <div class="node-subitems">
+                    <div class="node-subitem">
+                      <span class="node-subitem-name">Tunnel Protocol</span>
+                      <span class="node-subitem-port">QUIC / HTTP2</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Connector 2 -->
+                <div class="diagram-connector">
+                  <span class="connector-tag">Outbound Tunnel</span>
+                  <div class="connector-line"><span class="connector-pulse"></span></div>
+                </div>
+
+                <!-- Node 3: Homelab Node & Docker Bridge -->
+                <div class="diagram-node-card" style="border-color: var(--accent-cyan-border);">
+                  <div class="node-card-header">
+                    <span class="node-card-title">
+                      <span class="brand-indicator"></span>
+                      Host Node (mms · 192.168.1.75)
+                    </span>
+                    <span class="badge badge-cyan" style="font-size: 0.6875rem;">Docker Network</span>
+                  </div>
+                  <p class="node-card-desc">Systemd host daemon routes traffic into isolated Docker bridge. 0 open router ports.</p>
+                  
+                  <div class="node-subitems">
+                    <div class="node-subitem">
+                      <span class="node-subitem-name">Leantime Agile Project Workspace</span>
+                      <span class="node-subitem-port">Port 8090 → Bridge</span>
+                    </div>
+                    <div class="node-subitem">
+                      <span class="node-subitem-name">Maybe Finance &amp; Wealth Engine</span>
+                      <span class="node-subitem-port">Port 8092 → Bridge</span>
+                    </div>
+                    <div class="node-subitem">
+                      <span class="node-subitem-name">Forgejo Lightweight Git Server</span>
+                      <span class="node-subitem-port">Port 3003 → Bridge</span>
+                    </div>
+                    <div class="node-subitem">
+                      <span class="node-subitem-name">Jellyfin Media Streaming Server</span>
+                      <span class="node-subitem-port">Port 8096 → Bridge</span>
+                    </div>
+                    <div class="node-subitem" style="background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2);">
+                      <span class="node-subitem-name" style="color: #F87171;">MariaDB 11 &amp; Postgres 15 DBs</span>
+                      <span class="node-subitem-port" style="color: #F87171;">Zero Host Port (Isolated)</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Diagram 2: Dual-Storage Engine -->
+          <div class="diagram-view-pane" id="pane-storage">
+            <div style="margin-bottom: 24px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-medium); box-shadow: 0 8px 32px rgba(0,0,0,0.4);">
+              <img src="assets/storage_tiering_diagram.png" alt="Dual-Storage Engine Architecture Diagram" style="width: 100%; height: auto; display: block; border-radius: 12px;">
+            </div>
+            <div class="visual-canvas">
+              <div class="storage-diagram-grid">
+                <!-- NVMe SSD Bay -->
+                <div class="storage-bay-card" style="border-color: var(--accent-cyan-border);">
+                  <div class="bay-header">
+                    <div class="bay-title-group">
+                      <h3>Tier 1: High-Performance NVMe SSD</h3>
+                      <p>/home/maruf/homelab/volumes</p>
+                    </div>
+                    <span class="badge badge-ssd">Fast Random I/O</span>
+                  </div>
+                  <p style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.5;">
+                    Engineered for high-frequency ACID database transactions, in-memory caches, and application configurations.
+                  </p>
+                  <div class="bay-spec-tags">
+                    <span class="bay-spec-tag">Low Latency</span>
+                    <span class="bay-spec-tag">Transactional Storage</span>
+                    <span class="bay-spec-tag">Atomic Snapshots</span>
+                  </div>
+                  <div class="node-subitems">
+                    <div class="node-subitem">
+                      <span class="node-subitem-name">MariaDB 11 Database Engine</span>
+                      <span class="node-subitem-port">volumes/leantime/mysql</span>
+                    </div>
+                    <div class="node-subitem">
+                      <span class="node-subitem-name">PostgreSQL 15 &amp; Redis State</span>
+                      <span class="node-subitem-port">volumes/maybe/{postgres,redis}</span>
+                    </div>
+                    <div class="node-subitem">
+                      <span class="node-subitem-name">Forgejo Git Repositories</span>
+                      <span class="node-subitem-port">volumes/forgejo</span>
+                    </div>
+                    <div class="node-subitem">
+                      <span class="node-subitem-name">Grafana Dashboard SQLite State</span>
+                      <span class="node-subitem-port">volumes/grafana</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Bulk HDD Bay -->
+                <div class="storage-bay-card" style="border-color: var(--accent-amber);">
+                  <div class="bay-header">
+                    <div class="bay-title-group">
+                      <h3>Tier 2: High-Capacity Bulk HDD Bay</h3>
+                      <p>/home/maruf/MyHDDStorage</p>
+                    </div>
+                    <span class="badge badge-hdd">Bulk Capacity &amp; Retention</span>
+                  </div>
+                  <p style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.5;">
+                    Allocated for continuous streaming media reads, Prometheus metrics time-series retention, and nightly backup tar archives.
+                  </p>
+                  <div class="bay-spec-tags">
+                    <span class="bay-spec-tag">Multi-Terabyte</span>
+                    <span class="bay-spec-tag">Sequential Reads</span>
+                    <span class="bay-spec-tag">Disaster Mirror</span>
+                  </div>
+                  <div class="node-subitems">
+                    <div class="node-subitem">
+                      <span class="node-subitem-name">Jellyfin Media Library</span>
+                      <span class="node-subitem-port">Jellyfin/{Movies, TV, Music}</span>
+                    </div>
+                    <div class="node-subitem">
+                      <span class="node-subitem-name">Prometheus TSDB Long Retention</span>
+                      <span class="node-subitem-port">monitoring/prometheus</span>
+                    </div>
+                    <div class="node-subitem">
+                      <span class="node-subitem-name">Portainer Container State</span>
+                      <span class="node-subitem-port">docker/volumes/portainer</span>
+                    </div>
+                    <div class="node-subitem">
+                      <span class="node-subitem-name">Master Backup Tar Archive Mirror</span>
+                      <span class="node-subitem-port">backups/homelab_backup_*.tar.gz</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Diagram 3: 03:00 AM Disaster Recovery Sequence -->
+          <div class="diagram-view-pane" id="pane-backup">
+            <div style="margin-bottom: 24px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-medium); box-shadow: 0 8px 32px rgba(0,0,0,0.4);">
+              <img src="assets/backup_pipeline_diagram.png" alt="03:00 AM Disaster Recovery Pipeline Diagram" style="width: 100%; height: auto; display: block; border-radius: 12px;">
+            </div>
+            <div class="visual-canvas">
+              <div class="sequence-steps">
+                <div class="seq-step-card">
+                  <div class="seq-step-num">1</div>
+                  <span class="seq-step-title">MariaDB Dump</span>
+                  <p style="font-size: 0.75rem; color: var(--text-secondary);">Executes live transactional dump of Leantime tables.</p>
+                  <div class="seq-step-cmd">docker exec mariadb-dump</div>
+                </div>
+
+                <div class="seq-step-card">
+                  <div class="seq-step-num">2</div>
+                  <span class="seq-step-title">PostgreSQL Dump</span>
+                  <p style="font-size: 0.75rem; color: var(--text-secondary);">Performs pg_dump on Maybe Finance ledgers.</p>
+                  <div class="seq-step-cmd">docker exec pg_dump</div>
+                </div>
+
+                <div class="seq-step-card">
+                  <div class="seq-step-num">3</div>
+                  <span class="seq-step-title">SSD Volumes Tar</span>
+                  <p style="font-size: 0.75rem; color: var(--text-secondary);">Archives all SSD application state in read-only mode.</p>
+                  <div class="seq-step-cmd">tar -czf ssd_volumes.tar.gz</div>
+                </div>
+
+                <div class="seq-step-card">
+                  <div class="seq-step-num">4</div>
+                  <span class="seq-step-title">Master Packaging</span>
+                  <p style="font-size: 0.75rem; color: var(--text-secondary);">Bundles SQL dumps and configs into timestamped archive.</p>
+                  <div class="seq-step-cmd">homelab_backup_$(date).tar.gz</div>
+                </div>
+
+                <div class="seq-step-card">
+                  <div class="seq-step-num">5</div>
+                  <span class="seq-step-title">HDD Mirror &amp; Purge</span>
+                  <p style="font-size: 0.75rem; color: var(--text-secondary);">Mirrors archive to HDD storage and purges older backups.</p>
+                  <div class="seq-step-cmd">cp HDD/backups && rm old</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Diagram 4: Full System Blueprint Visual Map -->
+          <div class="diagram-view-pane" id="pane-blueprint">
+            <div style="margin-bottom: 24px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-medium); box-shadow: 0 8px 32px rgba(0,0,0,0.4);">
+              <img src="assets/system_blueprint_diagram.png" alt="Homelab Complete System Architecture Blueprint" style="width: 100%; height: auto; display: block; border-radius: 12px;">
+            </div>
+            <div class="visual-canvas">
+              <div class="blueprint-map">
+                <!-- Layer 1: Ingress Gateway -->
+                <div class="blueprint-layer">
+                  <div class="layer-header">
+                    <span class="layer-title">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-amber)" stroke-width="2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>
+                      Layer 1: Zero Trust Ingress &amp; Edge Gateway
+                    </span>
+                    <span class="layer-badge badge-amber">Cloudflare Edge &amp; Host Daemon (4 QUIC Tunnels)</span>
+                  </div>
+                  <div class="cluster-services" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px;">
+                    <div class="cluster-service-item">
+                      <span class="cluster-service-name">Public Ingress Domain</span>
+                      <span class="cluster-service-port">baaankai.dpdns.org</span>
+                    </div>
+                    <div class="cluster-service-item">
+                      <span class="cluster-service-name">Host Systemd Service</span>
+                      <span class="cluster-service-port">/usr/local/bin/cloudflared</span>
+                    </div>
+                    <div class="cluster-service-item">
+                      <span class="cluster-service-name">Inbound Router Ports</span>
+                      <span class="cluster-service-port" style="color: var(--accent-emerald);">0 Open (Full Stealth)</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="blueprint-flow-arrow">
+                  <span>▼ Encrypted Bridge Forwarding (Docker Bridge: homelab) ▼</span>
+                </div>
+
+                <!-- Layer 2: 12-Category Container Clusters -->
+                <div class="blueprint-layer" style="border-color: var(--accent-cyan-border);">
+                  <div class="layer-header">
+                    <span class="layer-title">
+                      <span class="brand-indicator"></span>
+                      Layer 2: Containerized Stacks (Isolated Bridge Network)
+                    </span>
+                    <span class="layer-badge badge-cyan">36+ Workloads · Healthchecked DB Startup</span>
+                  </div>
+
+                  <div class="blueprint-clusters">
+                    <!-- Cluster 1: Productivity -->
+                    <div class="cluster-card">
+                      <div class="cluster-header">
+                        <span class="cluster-title">Productivity &amp; Project</span>
+                        <span class="badge badge-active" style="font-size: 0.625rem;">SSD Tier</span>
+                      </div>
+                      <div class="cluster-services">
+                        <div class="cluster-service-item">
+                          <span class="cluster-service-name">Leantime Workspace</span>
+                          <span class="cluster-service-port">:8090</span>
+                        </div>
+                        <div class="cluster-service-item" style="background: rgba(239, 68, 68, 0.1);">
+                          <span class="cluster-service-name" style="color:#F87171;">Leantime MariaDB 11</span>
+                          <span class="cluster-service-port" style="color:#F87171;">:3306 (Internal)</span>
+                        </div>
+                        <div class="cluster-service-item">
+                          <span class="cluster-service-name">ChangeDetection</span>
+                          <span class="cluster-service-port">:5001</span>
+                        </div>
+                        <div class="cluster-service-item">
+                          <span class="cluster-service-name">Memos &amp; Vikunja</span>
+                          <span class="cluster-service-port">:5230 / :3456</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Cluster 2: Finance & Wealth -->
+                    <div class="cluster-card">
+                      <div class="cluster-header">
+                        <span class="cluster-title">Finance &amp; Wealth</span>
+                        <span class="badge badge-active" style="font-size: 0.625rem;">SSD Tier</span>
+                      </div>
+                      <div class="cluster-services">
+                        <div class="cluster-service-item">
+                          <span class="cluster-service-name">Maybe Finance App</span>
+                          <span class="cluster-service-port">:8092</span>
+                        </div>
+                        <div class="cluster-service-item" style="background: rgba(239, 68, 68, 0.1);">
+                          <span class="cluster-service-name" style="color:#F87171;">Maybe PostgreSQL 15</span>
+                          <span class="cluster-service-port" style="color:#F87171;">:5432 (Internal)</span>
+                        </div>
+                        <div class="cluster-service-item" style="background: rgba(239, 68, 68, 0.1);">
+                          <span class="cluster-service-name" style="color:#F87171;">Maybe Redis Cache</span>
+                          <span class="cluster-service-port" style="color:#F87171;">:6379 (Internal)</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Cluster 3: Sysadmin & Dev -->
+                    <div class="cluster-card">
+                      <div class="cluster-header">
+                        <span class="cluster-title">Sysadmin &amp; DevOps</span>
+                        <span class="badge badge-cyan" style="font-size: 0.625rem;">SSD + HDD</span>
+                      </div>
+                      <div class="cluster-services">
+                        <div class="cluster-service-item">
+                          <span class="cluster-service-name">Forgejo Git Server</span>
+                          <span class="cluster-service-port">:3003 / :2222</span>
+                        </div>
+                        <div class="cluster-service-item">
+                          <span class="cluster-service-name">ntfy Push Alerts</span>
+                          <span class="cluster-service-port">:8088</span>
+                        </div>
+                        <div class="cluster-service-item">
+                          <span class="cluster-service-name">Portainer Container UI</span>
+                          <span class="cluster-service-port">:9000 / :9443</span>
+                        </div>
+                        <div class="cluster-service-item">
+                          <span class="cluster-service-name">IT-Tools (50+ Utilities)</span>
+                          <span class="cluster-service-port">:8091</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Cluster 4: Observability -->
+                    <div class="cluster-card">
+                      <div class="cluster-header">
+                        <span class="cluster-title">Observability &amp; Metrics</span>
+                        <span class="badge badge-cyan" style="font-size: 0.625rem;">Telemetry</span>
+                      </div>
+                      <div class="cluster-services">
+                        <div class="cluster-service-item">
+                          <span class="cluster-service-name">Prometheus TSDB</span>
+                          <span class="cluster-service-port">:9093</span>
+                        </div>
+                        <div class="cluster-service-item">
+                          <span class="cluster-service-name">Grafana Dashboards</span>
+                          <span class="cluster-service-port">:3005</span>
+                        </div>
+                        <div class="cluster-service-item">
+                          <span class="cluster-service-name">Scrutiny S.M.A.R.T.</span>
+                          <span class="cluster-service-port">:8089</span>
+                        </div>
+                        <div class="cluster-service-item">
+                          <span class="cluster-service-name">Node Exporter &amp; cAdvisor</span>
+                          <span class="cluster-service-port">:9100 / :8083</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Cluster 5: Media & Streaming -->
+                    <div class="cluster-card">
+                      <div class="cluster-header">
+                        <span class="cluster-title">Media &amp; Automation</span>
+                        <span class="badge badge-hdd" style="font-size: 0.625rem;">HDD Tier</span>
+                      </div>
+                      <div class="cluster-services">
+                        <div class="cluster-service-item">
+                          <span class="cluster-service-name">Jellyfin Streaming</span>
+                          <span class="cluster-service-port">:8096</span>
+                        </div>
+                        <div class="cluster-service-item">
+                          <span class="cluster-service-name">Arr Automation Suite</span>
+                          <span class="cluster-service-port">:8989 / :7878</span>
+                        </div>
+                        <div class="cluster-service-item">
+                          <span class="cluster-service-name">Prowlarr &amp; Navidrome</span>
+                          <span class="cluster-service-port">:9696 / :4533</span>
+                        </div>
+                        <div class="cluster-service-item">
+                          <span class="cluster-service-name">qBittorrent Client</span>
+                          <span class="cluster-service-port">:8087</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Cluster 6: Disaster Recovery -->
+                    <div class="cluster-card">
+                      <div class="cluster-header">
+                        <span class="cluster-title">Disaster Recovery (03:00 AM)</span>
+                        <span class="badge badge-active" style="font-size: 0.625rem;">Nightly Cron</span>
+                      </div>
+                      <div class="cluster-services">
+                        <div class="cluster-service-item">
+                          <span class="cluster-service-name">MariaDB &amp; Postgres Dumps</span>
+                          <span class="cluster-service-port">Atomic SQL</span>
+                        </div>
+                        <div class="cluster-service-item">
+                          <span class="cluster-service-name">SSD Volumes Tar Compression</span>
+                          <span class="cluster-service-port">Read-Only</span>
+                        </div>
+                        <div class="cluster-service-item">
+                          <span class="cluster-service-name">Secondary HDD Snapshot Mirror</span>
+                          <span class="cluster-service-port">Auto Purge</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="blueprint-flow-arrow">
+                  <span>▼ Storage Mount Targets ▼</span>
+                </div>
+
+                <!-- Layer 3: Physical Storage Tiering -->
+                <div class="blueprint-layer">
+                  <div class="layer-header">
+                    <span class="layer-title">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-emerald)" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                      Layer 3: Physical Storage Tiering (Ubuntu Host System)
+                    </span>
+                    <span class="layer-badge badge-active">NVMe Fast Tier + Magnetic Bulk Bay</span>
+                  </div>
+                  <div class="cluster-services" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px;">
+                    <div class="cluster-service-item">
+                      <span class="cluster-service-name"><strong>Tier 1 NVMe SSD</strong> (/volumes)</span>
+                      <span class="cluster-service-port">DB Engines, Git, In-Memory Caches</span>
+                    </div>
+                    <div class="cluster-service-item">
+                      <span class="cluster-service-name"><strong>Tier 2 Bulk HDD</strong> (/MyHDDStorage)</span>
+                      <span class="cluster-service-port">Jellyfin Media, TSDB, Backup Archives</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Command Palette Modal -->
+  <div class="modal-backdrop" id="cmd-modal" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-modal="true">
+      <div class="modal-search-header">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="modal-search-input" class="modal-search-input" placeholder="Type a command, page name, service, or port...">
+        <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">ESC</span>
+      </div>
+      <ul class="modal-results" id="modal-results">
+        <!-- Rendered by app.js -->
+      </ul>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-meta">
+          <p><strong style="color: #FFFFFF;">Personal Homelab Architecture</strong> · Ubuntu Linux (mms)</p>
+          <p>Dual-Storage Tiering (NVMe SSD + Bulk HDD) · Cloudflare Zero Trust Ingress · Automated Snapshot Cron (03:00 AM)</p>
+        </div>
+
+        <ul class="footer-links">
+          <li><a href="index.html" class="footer-link">Architecture</a></li>
+          <li><a href="services.html" class="footer-link">App Catalog</a></li>
+          <li><a href="resources.html" class="footer-link">Resources</a></li>
+          <li><a href="runbook.html" class="footer-link">Playbook</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
