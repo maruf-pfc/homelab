@@ -1,5 +1,6 @@
 services:
   leantime-db:
+    profiles: ["disabled"]
     image: mariadb:11
     container_name: leantime-db
     restart: unless-stopped
@@ -20,6 +21,7 @@ services:
       - homelab
 
   leantime:
+    profiles: ["disabled"]
     image: leantime/leantime:latest
     container_name: leantime
     restart: unless-stopped

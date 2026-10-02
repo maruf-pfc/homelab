@@ -1,5 +1,6 @@
 services:
   prometheus:
+    profiles: ["disabled"]
     image: prom/prometheus:latest
     container_name: prometheus
     user: "0:0"
@@ -13,6 +14,7 @@ services:
       - homelab
 
   grafana:
+    profiles: ["disabled"]
     image: grafana/grafana-oss:latest
     container_name: grafana
     user: "0:0"
@@ -30,6 +32,7 @@ services:
       - homelab
 
   node-exporter:
+    profiles: ["disabled"]
     image: prom/node-exporter:latest
     container_name: node-exporter
     restart: unless-stopped
@@ -42,6 +45,7 @@ services:
       - homelab
 
   cadvisor:
+    profiles: ["disabled"]
     image: gcr.io/cadvisor/cadvisor:latest
     container_name: cadvisor
     restart: unless-stopped

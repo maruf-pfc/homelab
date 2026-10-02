@@ -13,7 +13,7 @@
 #   journalctl -u cloudflared -f
 # ============================================================
 
-services:
+services: {}
 
   # ── AdGuard Home (DNS Ad-Blocker) — disabled by default ──
   # adguard:
