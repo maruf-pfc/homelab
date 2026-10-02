@@ -1,9 +1,31 @@
-# ============================================================
-# This stack is currently a placeholder. Uncomment services
-# and add corresponding ENABLE_* flags in .env to activate.
-# ============================================================
-
-services: {}
+services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    container_name: n8n
+    restart: unless-stopped
+    ports:
+      - "${N8N_PORT:-5678}:5678"
+    environment:
+      - N8N_HOST=${N8N_HOST:-0.0.0.0}
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=${N8N_PROTOCOL:-https}
+      - NODE_ENV=production
+      - N8N_WEBHOOK_URL=${N8N_WEBHOOK_URL:-https://n8n.baaankai.dpdns.org/}
+      - WEBHOOK_URL=${N8N_WEBHOOK_URL:-https://n8n.baaankai.dpdns.org/}
+      - GENERIC_TIMEZONE=${TZ:-Asia/Dhaka}
+      - TZ=${TZ:-Asia/Dhaka}
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY:-n8n_default_homelab_encryption_key_change_me}
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+    volumes:
+      - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/n8n:/home/node/.n8n
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:5678/healthz || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - homelab
 
 networks:
   homelab:

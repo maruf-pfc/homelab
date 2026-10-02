@@ -58,6 +58,7 @@ ENABLE_GRAFANA="${ENABLE_GRAFANA:-true}"
 ENABLE_NODE_EXPORTER="${ENABLE_NODE_EXPORTER:-true}"
 ENABLE_CADVISOR="${ENABLE_CADVISOR:-true}"
 ENABLE_CLOUDFLARED="${ENABLE_CLOUDFLARED:-true}"
+ENABLE_N8N="${ENABLE_N8N:-true}"
 
 # Optional Catalog Stack Flags
 ENABLE_VAULTWARDEN="${ENABLE_VAULTWARDEN:-false}"
@@ -100,6 +101,7 @@ check_port_conflict() {
 [ "${ENABLE_CADVISOR}" = "true" ] && check_port_conflict "cAdvisor" "${CADVISOR_PORT:-8083}"
 [ "${ENABLE_NODE_EXPORTER}" = "true" ] && check_port_conflict "Node Exporter" "${NODE_EXPORTER_PORT:-9100}"
 [ "${ENABLE_VAULTWARDEN}" = "true" ] && check_port_conflict "Vaultwarden" "${VAULTWARDEN_PORT:-8082}"
+[ "${ENABLE_N8N}" = "true" ] && check_port_conflict "n8n" "${N8N_PORT:-5678}"
 
 echo -e "${GREEN}[✓] Port conflict validation passed cleanly!${NC}"
 
@@ -107,7 +109,7 @@ echo -e "${GREEN}[✓] Port conflict validation passed cleanly!${NC}"
 run_stack_service() {
     local compose_file="$1"
     shift
-    docker compose -f "${compose_file}" up -d --no-recreate "$@" 2>/dev/null || true
+    docker compose --env-file "${ENV_FILE}" -f "${compose_file}" up -d --no-recreate "$@" 2>/dev/null || true
 }
 
 # 5. Category 1: Media Stack (HDD Storage for Jellyfin Config & Media)
@@ -183,7 +185,16 @@ if [ ${#SYSADMIN_SERVICES[@]} -gt 0 ]; then
     run_stack_service "${ROOT_DIR}/apps/sysadmin/docker-compose.yml" "${SYSADMIN_SERVICES[@]}"
 fi
 
-# 12. Final Execution Summary Table
+# 12. Category 12: Workflows Stack (SSD Storage for n8n)
+echo -e "${CYAN}[+] Processing Category 12: Workflows Stack (apps/workflows)...${NC}"
+WORKFLOW_SERVICES=()
+[ "${ENABLE_N8N:-false}" = "true" ] && WORKFLOW_SERVICES+=(n8n)
+if [ ${#WORKFLOW_SERVICES[@]} -gt 0 ]; then
+    mkdir -p "${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/n8n"
+    run_stack_service "${ROOT_DIR}/apps/workflows/docker-compose.yml" "${WORKFLOW_SERVICES[@]}"
+fi
+
+# 13. Final Execution Summary Table
 echo -e "\n${CYAN}======================================================================${NC}"
 echo -e "${CYAN} 📊 HOMELAB SERVICE STATUS SUMMARY ${NC}"
 echo -e "${CYAN}======================================================================${NC}"
@@ -218,6 +229,7 @@ print_service_status "ChangeDetection (SSD)" "${ENABLE_CHANGEDETECTION:-false}" 
 print_service_status "Jellyfin (HDD)" "${ENABLE_JELLYFIN}" "${JELLYFIN_PORT:-8096}" "http://192.168.1.75:8096"
 print_service_status "Prometheus (SSD)" "${ENABLE_PROMETHEUS}" "${PROMETHEUS_PORT:-9093}" "http://192.168.1.75:9093"
 print_service_status "Grafana (SSD)" "${ENABLE_GRAFANA}" "${GRAFANA_PORT:-3005}" "http://192.168.1.75:3005"
+print_service_status "n8n (SSD)" "${ENABLE_N8N}" "${N8N_PORT:-5678}" "http://192.168.1.75:5678"
 
 echo "--------------------------------------------------------------------------------"
 echo -e "${GREEN}[✓] Homelab category-wise dynamic orchestration completed successfully!${NC}"
