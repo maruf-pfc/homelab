@@ -1,18 +1,16 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# Leantime Post-Update Automation & Backup Orchestrator
+# Leantime Docker Release Update & Backup Orchestrator
 # Location: /home/maruf/homelab/scripts/update-leantime.sh
 #
 # Purpose:
-#   Performs all required actions after updating Leantime source code:
+#   Performs all required actions to update Leantime using official Docker releases:
 #   1. Automatic pre-update safety backup (MariaDB dump + userfiles volume)
-#   2. Optional git pull
-#   3. npm dependencies installation
-#   4. Production asset bundling (npx mix --production) for new appVersion
-#   5. Tailwind blocklist generation (generateBlocklist.mjs)
-#   6. Pending database migrations (./bin/leantime db:migrate)
-#   7. Manifest and view cache flush (./bin/leantime cache:clearAll)
-#   8. Container health check and HTTP verification
+#   2. Pull latest official Docker image (leantime/leantime:latest)
+#   3. Recreate container with production environment variables
+#   4. Execute pending database migrations (./bin/leantime db:migrate)
+#   5. Flush application and view caches (./bin/leantime cache:clearAll)
+#   6. Automated health verification
 # ==============================================================================
 
 set -euo pipefail
@@ -27,24 +25,22 @@ NC='\033[0m'
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HOMELAB_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
-LEANTIME_REPO_DIR="${HOMELAB_ROOT}/github/leantime"
+COMPOSE_FILE="${HOMELAB_ROOT}/apps/productivity/docker-compose.yml"
 TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
 BACKUP_ROOT="${HOMELAB_ROOT}/backups/leantime"
 BACKUP_DIR="${BACKUP_ROOT}/backup_${TIMESTAMP}"
 HDD_BACKUP_DIR="/home/maruf/MyHDDStorage/backups/leantime"
 
 # CLI flags
-DO_GIT_PULL=false
 SKIP_BACKUP=false
 
 print_usage() {
     cat << EOF
 Usage: $(basename "$0") [OPTIONS]
 
-Post-update automation for Leantime in Homelab.
+Update Leantime using the official Docker release image with automated backups.
 
 Options:
-  --pull           Run 'git pull origin master' in the leantime repository first
   --skip-backup    Skip creating pre-update database and volume backups
   -h, --help       Show this help message
 EOF
@@ -53,10 +49,6 @@ EOF
 # Parse CLI arguments
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --pull)
-            DO_GIT_PULL=true
-            shift
-            ;;
         --skip-backup)
             SKIP_BACKUP=true
             shift
@@ -74,7 +66,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 echo -e "${CYAN}======================================================================${NC}"
-echo -e "${CYAN} ${BOLD}⚡ LEANTIME POST-UPDATE AUTOMATION & BACKUP ORCHESTRATOR${NC}"
+echo -e "${CYAN} ${BOLD}⚡ LEANTIME DOCKER RELEASE UPDATE & BACKUP ORCHESTRATOR${NC}"
 echo -e "${CYAN}======================================================================${NC}"
 
 # ------------------------------------------------------------------------------
@@ -91,11 +83,6 @@ else
     exit 1
 fi
 
-if [[ ! -d "${LEANTIME_REPO_DIR}" ]]; then
-    echo -e "${RED}[!] Leantime repository directory not found at ${LEANTIME_REPO_DIR}${NC}" >&2
-    exit 1
-fi
-
 PORT="${LEANTIME_PORT:-8090}"
 DB_CONTAINER="leantime-db"
 APP_CONTAINER="leantime"
@@ -107,7 +94,7 @@ VOLUMES_DIR="${SSD_DATA_DIR:-${HOMELAB_ROOT}/volumes}/leantime"
 # 2. Pre-update Data Backup
 # ------------------------------------------------------------------------------
 if [[ "${SKIP_BACKUP}" = false ]]; then
-    echo -e "\n${CYAN}[1/7] Creating pre-update safety backup...${NC}"
+    echo -e "\n${CYAN}[1/5] Creating pre-update safety backup...${NC}"
     mkdir -p "${BACKUP_DIR}"
 
     # Database Dump
@@ -128,7 +115,7 @@ if [[ "${SKIP_BACKUP}" = false ]]; then
         echo -e "${YELLOW}  ⚠ Database container '${DB_CONTAINER}' is not running! Skipping DB dump.${NC}"
     fi
 
-    # Config & Userfiles Volume Backup (via alpine container to handle root/mysql file permissions)
+    # Config & Userfiles Volume Backup (via alpine container to handle root file permissions)
     if [[ -d "${VOLUMES_DIR}" ]]; then
         echo -e "${GREEN}  → Archiving Leantime volumes (${VOLUMES_DIR})...${NC}"
         docker run --rm \
@@ -157,71 +144,52 @@ if [[ "${SKIP_BACKUP}" = false ]]; then
         find "${HDD_BACKUP_DIR}" -name "leantime_pre_update_*.tar.gz" -type f | sort -r | tail -n +6 | xargs -r rm -f
     fi
 else
-    echo -e "\n${YELLOW}[1/7] Skipping backup as requested (--skip-backup).${NC}"
+    echo -e "\n${YELLOW}[1/5] Skipping backup as requested (--skip-backup).${NC}"
 fi
 
 # ------------------------------------------------------------------------------
-# 3. Repository Updates
+# 3. Pull Official Docker Release Image
 # ------------------------------------------------------------------------------
-cd "${LEANTIME_REPO_DIR}"
+echo -e "\n${CYAN}[2/5] Pulling latest official Leantime Docker release image...${NC}"
+docker pull leantime/leantime:latest
 
-if [[ "${DO_GIT_PULL}" = true ]]; then
-    echo -e "\n${CYAN}[2/7] Pulling latest changes from git...${NC}"
-    git pull origin master
-else
-    echo -e "\n${CYAN}[2/7] Operating on current repository commit...${NC}"
-fi
-
-GIT_REV="$(git rev-parse --short HEAD)"
-APP_VERSION="$(grep "appVersion" "${LEANTIME_REPO_DIR}/app/Core/Configuration/AppSettings.php" | awk -F"'" '{print $2}')"
-echo -e "${GREEN}  ✓ Current commit: ${GIT_REV}${NC}"
-echo -e "${GREEN}  ✓ Detected Leantime version: ${BOLD}${APP_VERSION}${NC}"
+IMAGE_DIGEST="$(docker inspect leantime/leantime:latest --format '{{index .RepoDigests 0}}' 2>/dev/null || echo "leantime/leantime:latest")"
+echo -e "${GREEN}  ✓ Image Digest: ${IMAGE_DIGEST}${NC}"
 
 # ------------------------------------------------------------------------------
-# 4. Frontend Dependencies & Build Pipeline
+# 4. Recreate Container with Production Environment
 # ------------------------------------------------------------------------------
-echo -e "\n${CYAN}[3/7] Installing npm dependencies...${NC}"
-npm install --silent
-
-echo -e "\n${CYAN}[4/7] Compiling production assets with Laravel Mix...${NC}"
-npx mix --production
-
-echo -e "\n${CYAN}[5/7] Generating Tailwind class blocklist...${NC}"
-node generateBlocklist.mjs
+echo -e "\n${CYAN}[3/5] Recreating '${APP_CONTAINER}' container...${NC}"
+docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" up -d --force-recreate "${APP_CONTAINER}"
 
 # ------------------------------------------------------------------------------
 # 5. Database Migrations & Cache Invalidation
 # ------------------------------------------------------------------------------
-echo -e "\n${CYAN}[6/7] Running database migrations and clearing application caches...${NC}"
+echo -e "\n${CYAN}[4/5] Running database migrations and clearing application caches...${NC}"
 
-if docker ps --format '{{.Names}}' | grep -Eq "^${APP_CONTAINER}$"; then
-    echo -e "${GREEN}  → Executing pending database migrations...${NC}"
-    docker exec "${APP_CONTAINER}" ./bin/leantime db:migrate
+# Wait briefly for PHP-FPM / web server to initialize
+sleep 3
 
-    echo -e "${GREEN}  → Clearing compiled views, manifest paths, and bootstrap cache...${NC}"
-    docker exec "${APP_CONTAINER}" ./bin/leantime cache:clearAll
+echo -e "${GREEN}  → Executing pending database migrations...${NC}"
+docker exec "${APP_CONTAINER}" ./bin/leantime db:migrate
 
-    echo -e "${GREEN}  → Restarting '${APP_CONTAINER}' container...${NC}"
-    docker restart "${APP_CONTAINER}" >/dev/null
-else
-    echo -e "${YELLOW}  ⚠ Container '${APP_CONTAINER}' is not running. Starting it via docker compose...${NC}"
-    docker compose -f "${HOMELAB_ROOT}/apps/productivity/docker-compose.yml" up -d "${APP_CONTAINER}"
-    docker exec "${APP_CONTAINER}" ./bin/leantime db:migrate
-    docker exec "${APP_CONTAINER}" ./bin/leantime cache:clearAll
-fi
+echo -e "${GREEN}  → Clearing compiled views, manifest paths, and bootstrap cache...${NC}"
+docker exec "${APP_CONTAINER}" ./bin/leantime cache:clearAll
+
+APP_VERSION="$(docker exec "${APP_CONTAINER}" grep "appVersion" /var/www/html/app/Core/Configuration/AppSettings.php | awk -F"'" '{print $2}')"
 
 # ------------------------------------------------------------------------------
 # 6. Service Health Check & Verification
 # ------------------------------------------------------------------------------
-echo -e "\n${CYAN}[7/7] Performing automated health verification...${NC}"
+echo -e "\n${CYAN}[5/5] Performing automated health verification...${NC}"
 
 MAX_RETRIES=15
 RETRY_COUNT=0
 HEALTHY=false
 
-echo -e "  → Waiting for Leantime to respond on port ${PORT}..."
+echo -e "  → Waiting for Leantime to respond..."
 while [[ ${RETRY_COUNT} -lt ${MAX_RETRIES} ]]; do
-    HTTP_CODE="$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:${PORT}/auth/login" || echo "000")"
+    HTTP_CODE="$(curl -s -L -o /dev/null -w "%{http_code}" "${LEANTIME_URL:-https://leantime.baaankai.dpdns.org}" || echo "000")"
     if [[ "${HTTP_CODE}" == "200" || "${HTTP_CODE}" == "302" ]]; then
         HEALTHY=true
         break
@@ -238,19 +206,11 @@ else
     exit 1
 fi
 
-# Verify CSS bundle accessibility
-CSS_CODE="$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:${PORT}/dist/css/main.${APP_VERSION}.min.css" || echo "000")"
-if [[ "${CSS_CODE}" == "200" ]]; then
-    echo -e "${GREEN}  ✓ Stylesheet 'main.${APP_VERSION}.min.css' is loading cleanly (HTTP 200).${NC}"
-else
-    echo -e "${YELLOW}  ⚠ Warning: Stylesheet returned HTTP ${CSS_CODE}. Check public/dist/css/.${NC}"
-fi
-
 echo -e "\n${GREEN}======================================================================${NC}"
-echo -e "${GREEN} ${BOLD}🎉 LEANTIME UPDATE COMPLETED SUCCESSFULLY!${NC}"
+echo -e "${GREEN} ${BOLD}🎉 LEANTIME DOCKER UPDATE COMPLETED SUCCESSFULLY!${NC}"
 echo -e "${GREEN}======================================================================${NC}"
-echo -e "  • Version   : ${BOLD}${APP_VERSION}${NC} (${GIT_REV})"
-echo -e "  • Local URL : http://127.0.0.1:${PORT}"
+echo -e "  • Version   : ${BOLD}${APP_VERSION}${NC}"
+echo -e "  • Image     : ${IMAGE_DIGEST}"
 echo -e "  • Public URL: ${LEANTIME_URL:-https://leantime.baaankai.dpdns.org}"
 if [[ "${SKIP_BACKUP}" = false ]]; then
     echo -e "  • Backup    : ${ARCHIVE_TAR}"
