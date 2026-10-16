@@ -29,7 +29,8 @@ COMPOSE_FILE="${HOMELAB_ROOT}/apps/productivity/docker-compose.yml"
 TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
 BACKUP_ROOT="${HOMELAB_ROOT}/backups/leantime"
 BACKUP_DIR="${BACKUP_ROOT}/backup_${TIMESTAMP}"
-HDD_BACKUP_DIR="/home/maruf/MyHDDStorage/backups/leantime"
+HDD_BASE="${HDD_DATA_DIR:-/home/maruf/MyHDDStorage}"
+HDD_BACKUP_DIR="${HDD_BASE}/backups/leantime"
 
 # CLI flags
 SKIP_BACKUP=false
@@ -187,10 +188,10 @@ MAX_RETRIES=15
 RETRY_COUNT=0
 HEALTHY=false
 
-echo -e "  → Waiting for Leantime to respond..."
+echo -e "  → Waiting for Leantime to respond on localhost:${PORT}..."
 while [[ ${RETRY_COUNT} -lt ${MAX_RETRIES} ]]; do
-    HTTP_CODE="$(curl -s -L -o /dev/null -w "%{http_code}" "${LEANTIME_URL:-https://leantime.baaankai.dpdns.org}" || echo "000")"
-    if [[ "${HTTP_CODE}" == "200" || "${HTTP_CODE}" == "302" ]]; then
+    HTTP_CODE="$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:${PORT}" || echo "000")"
+    if [[ "${HTTP_CODE}" == "200" || "${HTTP_CODE}" == "302" || "${HTTP_CODE}" == "303" ]]; then
         HEALTHY=true
         break
     fi
@@ -201,7 +202,7 @@ done
 if [[ "${HEALTHY}" = true ]]; then
     echo -e "${GREEN}  ✓ Web server is responding (HTTP ${HTTP_CODE}).${NC}"
 else
-    echo -e "${RED}  ✗ Web server failed to respond with 200/302 after $((MAX_RETRIES * 2)) seconds.${NC}" >&2
+    echo -e "${RED}  ✗ Web server failed to respond on localhost:${PORT} after $((MAX_RETRIES * 2)) seconds.${NC}" >&2
     echo -e "${YELLOW}  Check container logs with: docker logs ${APP_CONTAINER} --tail 50${NC}"
     exit 1
 fi

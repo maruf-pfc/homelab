@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# Master Category-Wise Homelab Orchestrator & Selective Deployment Engine
-# Author: Senior DevOps Automated Assistant
+# 🚀 Master Category-Wise Homelab Orchestrator & Selective Deployment Engine
 # ==============================================================================
 
 set -euo pipefail
@@ -9,12 +8,11 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-# Color Definitions for DevOps Output
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
 CYAN='\033[0;36m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
 echo -e "${CYAN}======================================================================${NC}"
 echo -e "${CYAN} 🚀 HOMELAB CATEGORY-WISE DYNAMIC ORCHESTRATOR & DEPLOYER ${NC}"
@@ -27,7 +25,6 @@ if [ ! -f "${ENV_FILE}" ]; then
     cp "${ROOT_DIR}/.env.example" "${ENV_FILE}"
 fi
 
-# Export all env variables from .env
 set -a
 # shellcheck disable=SC1090
 source "${ENV_FILE}"
@@ -42,26 +39,28 @@ else
     echo -e "${GREEN}[✓] External Docker network '${NETWORK_NAME}' active.${NC}"
 fi
 
-# 3. Default Toggle Flags (Active vs Inactive)
+# 3. Default Toggle Flags
 ENABLE_PORTAINER="${ENABLE_PORTAINER:-true}"
 ENABLE_UPTIME_KUMA="${ENABLE_UPTIME_KUMA:-false}"
 ENABLE_DASHY="${ENABLE_DASHY:-false}"
 ENABLE_IT_TOOLS="${ENABLE_IT_TOOLS:-true}"
-ENABLE_FORGEJO="${ENABLE_FORGEJO:-true}"
-ENABLE_NTFY="${ENABLE_NTFY:-true}"
-ENABLE_SCRUTINY="${ENABLE_SCRUTINY:-true}"
-ENABLE_MAYBE="${ENABLE_MAYBE:-true}"
+ENABLE_FORGEJO="${ENABLE_FORGEJO:-false}"
+ENABLE_NTFY="${ENABLE_NTFY:-false}"
+ENABLE_SCRUTINY="${ENABLE_SCRUTINY:-false}"
+ENABLE_MAYBE="${ENABLE_MAYBE:-false}"
 ENABLE_LEANTIME="${ENABLE_LEANTIME:-true}"
+ENABLE_LEANTIME_DEV="${ENABLE_LEANTIME_DEV:-false}"
+ENABLE_CHANGEDETECTION="${ENABLE_CHANGEDETECTION:-false}"
 ENABLE_JELLYFIN="${ENABLE_JELLYFIN:-true}"
-ENABLE_PROMETHEUS="${ENABLE_PROMETHEUS:-true}"
-ENABLE_GRAFANA="${ENABLE_GRAFANA:-true}"
-ENABLE_NODE_EXPORTER="${ENABLE_NODE_EXPORTER:-true}"
-ENABLE_CADVISOR="${ENABLE_CADVISOR:-true}"
+ENABLE_PROMETHEUS="${ENABLE_PROMETHEUS:-false}"
+ENABLE_GRAFANA="${ENABLE_GRAFANA:-false}"
+ENABLE_NODE_EXPORTER="${ENABLE_NODE_EXPORTER:-false}"
+ENABLE_CADVISOR="${ENABLE_CADVISOR:-false}"
 ENABLE_CLOUDFLARED="${ENABLE_CLOUDFLARED:-true}"
 ENABLE_N8N="${ENABLE_N8N:-true}"
 
-# Optional Catalog Stack Flags
-ENABLE_VAULTWARDEN="${ENABLE_VAULTWARDEN:-false}"
+SSD_BASE="${SSD_DATA_DIR:-${ROOT_DIR}/volumes}"
+HDD_BASE="${HDD_DATA_DIR:-/home/maruf/MyHDDStorage}"
 
 # 4. Pre-Flight Port Conflict Validation
 echo -e "${GREEN}[+] Performing pre-flight port collision & security checks...${NC}"
@@ -83,7 +82,6 @@ check_port_conflict() {
     PORT_MAP["${port_num}"]="${service_name}"
 }
 
-# Validate enabled service ports
 [ "${ENABLE_PORTAINER}" = "true" ] && check_port_conflict "Portainer" "${PORTAINER_HTTP_PORT:-9000}"
 [ "${ENABLE_UPTIME_KUMA}" = "true" ] && check_port_conflict "Uptime Kuma" "${UPTIME_KUMA_PORT:-3001}"
 [ "${ENABLE_DASHY}" = "true" ] && check_port_conflict "Dashy" "${DASHBOARD_PORT:-7575}"
@@ -94,13 +92,13 @@ check_port_conflict() {
 [ "${ENABLE_SCRUTINY}" = "true" ] && check_port_conflict "Scrutiny" "${SCRUTINY_PORT:-8089}"
 [ "${ENABLE_MAYBE}" = "true" ] && check_port_conflict "Maybe Finance" "${MAYBE_PORT:-8092}"
 [ "${ENABLE_LEANTIME}" = "true" ] && check_port_conflict "Leantime" "${LEANTIME_PORT:-8090}"
-[ "${ENABLE_LEANTIME_DEV}" = "true" ] && check_port_conflict "Leantime Telegram (Dev)" "${LEANTIME_DEV_PORT:-8098}"
+[ "${ENABLE_LEANTIME_DEV}" = "true" ] && check_port_conflict "Leantime Telegram" "${LEANTIME_DEV_PORT:-8098}"
+[ "${ENABLE_CHANGEDETECTION}" = "true" ] && check_port_conflict "ChangeDetection" "${CHANGEDETECTION_PORT:-5001}"
 [ "${ENABLE_JELLYFIN}" = "true" ] && check_port_conflict "Jellyfin" "${JELLYFIN_PORT:-8096}"
 [ "${ENABLE_PROMETHEUS}" = "true" ] && check_port_conflict "Prometheus" "${PROMETHEUS_PORT:-9093}"
 [ "${ENABLE_GRAFANA}" = "true" ] && check_port_conflict "Grafana" "${GRAFANA_PORT:-3005}"
 [ "${ENABLE_CADVISOR}" = "true" ] && check_port_conflict "cAdvisor" "${CADVISOR_PORT:-8083}"
 [ "${ENABLE_NODE_EXPORTER}" = "true" ] && check_port_conflict "Node Exporter" "${NODE_EXPORTER_PORT:-9100}"
-[ "${ENABLE_VAULTWARDEN}" = "true" ] && check_port_conflict "Vaultwarden" "${VAULTWARDEN_PORT:-8082}"
 [ "${ENABLE_N8N}" = "true" ] && check_port_conflict "n8n" "${N8N_PORT:-5678}"
 
 echo -e "${GREEN}[✓] Port conflict validation passed cleanly!${NC}"
@@ -109,40 +107,41 @@ echo -e "${GREEN}[✓] Port conflict validation passed cleanly!${NC}"
 run_stack_service() {
     local compose_file="$1"
     shift
-    docker compose --env-file "${ENV_FILE}" -f "${compose_file}" up -d --no-recreate "$@" 2>/dev/null || true
+    docker compose --env-file "${ENV_FILE}" -f "${compose_file}" up -d --no-recreate "$@"
 }
 
-# 5. Category 1: Media Stack (HDD Storage for Jellyfin Config & Media)
+# 5. Category 1: Media Stack
 echo -e "${CYAN}[+] Processing Category 1: Media Stack (apps/media)...${NC}"
 if [ "${ENABLE_JELLYFIN}" = "true" ]; then
-    mkdir -p "${HDD_DATA_DIR:-/home/maruf/MyHDDStorage}/docker/volumes/jellyfin/config"
-    mkdir -p "${HDD_DATA_DIR:-/home/maruf/MyHDDStorage}/docker/volumes/jellyfin/cache"
+    mkdir -p "${HDD_BASE}/docker/volumes/jellyfin/config" "${HDD_BASE}/docker/volumes/jellyfin/cache"
     run_stack_service "${ROOT_DIR}/apps/media/docker-compose.yml" jellyfin
 fi
 
-# 6. Category 2: Finance Stack (SSD Storage)
+# 6. Category 2: Finance Stack
 echo -e "${CYAN}[+] Processing Category 2: Finance Stack (apps/finance)...${NC}"
 if [ "${ENABLE_MAYBE}" = "true" ]; then
-    mkdir -p "${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/maybe/storage"
-    mkdir -p "${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/maybe/postgres"
-    mkdir -p "${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/maybe/redis"
+    mkdir -p "${SSD_BASE}/maybe/storage" "${SSD_BASE}/maybe/postgres" "${SSD_BASE}/maybe/redis"
     run_stack_service "${ROOT_DIR}/apps/finance/docker-compose.yml" maybe-db maybe-redis maybe
 fi
 
-# 7. Category 3: Dashboards Stack (SSD Storage)
+# 7. Category 3: Dashboards Stack
 echo -e "${CYAN}[+] Processing Category 3: Dashboards Stack (apps/dashboards)...${NC}"
 if [ "${ENABLE_DASHY}" = "true" ]; then
-    mkdir -p "${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/dashy"
+    mkdir -p "${SSD_BASE}/dashy"
     run_stack_service "${ROOT_DIR}/apps/dashboards/docker-compose.yml" dashy
 fi
 
-# 8. Category 4: Network & Ingress Stack
+# 8. Category 4: Network & Ingress Stack (Host Cloudflare Daemon)
 echo -e "${CYAN}[+] Processing Category 4: Network & Ingress (apps/network)...${NC}"
 if [ "${ENABLE_CLOUDFLARED}" = "true" ]; then
-    run_stack_service "${ROOT_DIR}/apps/network/docker-compose.yml" cloudflared
+    if systemctl is-active --quiet cloudflared 2>/dev/null; then
+        echo -e "${GREEN}[✓] Cloudflare Tunnel daemon is active.${NC}"
+    else
+        echo -e "${YELLOW}[!] Cloudflare Tunnel daemon is inactive or not configured.${NC}"
+    fi
 fi
 
-# 9. Category 5: Monitoring Stack (SSD Storage)
+# 9. Category 5: Monitoring Stack
 echo -e "${CYAN}[+] Processing Category 5: Observability Stack (apps/monitoring)...${NC}"
 MONITORING_SERVICES=()
 [ "${ENABLE_PROMETHEUS:-false}" = "true" ] && MONITORING_SERVICES+=(prometheus)
@@ -151,25 +150,25 @@ MONITORING_SERVICES=()
 [ "${ENABLE_CADVISOR:-false}" = "true" ] && MONITORING_SERVICES+=(cadvisor)
 [ "${ENABLE_SCRUTINY:-false}" = "true" ] && MONITORING_SERVICES+=(scrutiny)
 if [ ${#MONITORING_SERVICES[@]} -gt 0 ]; then
-    [ "${ENABLE_GRAFANA:-false}" = "true" ] && mkdir -p "${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/grafana"
-    [ "${ENABLE_PROMETHEUS:-false}" = "true" ] && mkdir -p "${HDD_DATA_DIR:-/home/maruf/MyHDDStorage}/monitoring/prometheus"
-    [ "${ENABLE_SCRUTINY:-false}" = "true" ] && mkdir -p "${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/scrutiny/config" "${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/scrutiny/influxdb"
+    [ "${ENABLE_GRAFANA:-false}" = "true" ] && mkdir -p "${SSD_BASE}/grafana"
+    [ "${ENABLE_PROMETHEUS:-false}" = "true" ] && mkdir -p "${HDD_BASE}/monitoring/prometheus"
+    [ "${ENABLE_SCRUTINY:-false}" = "true" ] && mkdir -p "${SSD_BASE}/scrutiny/config" "${SSD_BASE}/scrutiny/influxdb"
     run_stack_service "${ROOT_DIR}/apps/monitoring/docker-compose.yml" "${MONITORING_SERVICES[@]}"
 fi
 
-# 10. Category 8: Productivity Stack (SSD Storage for Leantime + MariaDB, ChangeDetection)
+# 10. Category 8: Productivity Stack
 echo -e "${CYAN}[+] Processing Category 8: Productivity Stack (apps/productivity)...${NC}"
 PROD_SERVICES=()
 [ "${ENABLE_LEANTIME:-false}" = "true" ] && PROD_SERVICES+=(leantime-db leantime)
 [ "${ENABLE_LEANTIME_DEV:-false}" = "true" ] && PROD_SERVICES+=(leantime-db leantime-telegram)
 [ "${ENABLE_CHANGEDETECTION:-false}" = "true" ] && PROD_SERVICES+=(changedetection)
 if [ ${#PROD_SERVICES[@]} -gt 0 ]; then
-    [ "${ENABLE_LEANTIME:-false}" = "true" ] || [ "${ENABLE_LEANTIME_DEV:-false}" = "true" ] && mkdir -p "${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/leantime/config" "${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/leantime/mysql"
-    [ "${ENABLE_CHANGEDETECTION:-false}" = "true" ] && mkdir -p "${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/changedetection"
+    mkdir -p "${SSD_BASE}/leantime/config" "${SSD_BASE}/leantime/mysql"
+    [ "${ENABLE_CHANGEDETECTION:-false}" = "true" ] && mkdir -p "${SSD_BASE}/changedetection"
     run_stack_service "${ROOT_DIR}/apps/productivity/docker-compose.yml" "${PROD_SERVICES[@]}"
 fi
 
-# 11. Category 10: Sysadmin Stack (HDD & SSD Storage)
+# 11. Category 10: Sysadmin Stack
 echo -e "${CYAN}[+] Processing Category 10: Sysadmin Stack (apps/sysadmin)...${NC}"
 SYSADMIN_SERVICES=()
 [ "${ENABLE_PORTAINER:-false}" = "true" ] && SYSADMIN_SERVICES+=(portainer)
@@ -178,23 +177,23 @@ SYSADMIN_SERVICES=()
 [ "${ENABLE_FORGEJO:-false}" = "true" ] && SYSADMIN_SERVICES+=(forgejo)
 [ "${ENABLE_NTFY:-false}" = "true" ] && SYSADMIN_SERVICES+=(ntfy)
 if [ ${#SYSADMIN_SERVICES[@]} -gt 0 ]; then
-    [ "${ENABLE_PORTAINER:-false}" = "true" ] && mkdir -p "${HDD_DATA_DIR:-/home/maruf/MyHDDStorage}/docker/volumes/portainer"
-    [ "${ENABLE_UPTIME_KUMA:-false}" = "true" ] && mkdir -p "${HDD_DATA_DIR:-/home/maruf/MyHDDStorage}/docker/volumes/uptime-kuma"
-    [ "${ENABLE_FORGEJO:-false}" = "true" ] && mkdir -p "${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/forgejo"
-    [ "${ENABLE_NTFY:-false}" = "true" ] && mkdir -p "${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/ntfy/cache" "${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/ntfy/data" "${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/ntfy/etc"
+    [ "${ENABLE_PORTAINER:-false}" = "true" ] && mkdir -p "${HDD_BASE}/docker/volumes/portainer"
+    [ "${ENABLE_UPTIME_KUMA:-false}" = "true" ] && mkdir -p "${HDD_BASE}/docker/volumes/uptime-kuma"
+    [ "${ENABLE_FORGEJO:-false}" = "true" ] && mkdir -p "${SSD_BASE}/forgejo"
+    [ "${ENABLE_NTFY:-false}" = "true" ] && mkdir -p "${SSD_BASE}/ntfy/cache" "${SSD_BASE}/ntfy/data" "${SSD_BASE}/ntfy/etc"
     run_stack_service "${ROOT_DIR}/apps/sysadmin/docker-compose.yml" "${SYSADMIN_SERVICES[@]}"
 fi
 
-# 12. Category 12: Workflows Stack (SSD Storage for n8n)
+# 12. Category 12: Workflows Stack
 echo -e "${CYAN}[+] Processing Category 12: Workflows Stack (apps/workflows)...${NC}"
 WORKFLOW_SERVICES=()
 [ "${ENABLE_N8N:-false}" = "true" ] && WORKFLOW_SERVICES+=(n8n)
 if [ ${#WORKFLOW_SERVICES[@]} -gt 0 ]; then
-    mkdir -p "${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/n8n"
+    mkdir -p "${SSD_BASE}/n8n"
     run_stack_service "${ROOT_DIR}/apps/workflows/docker-compose.yml" "${WORKFLOW_SERVICES[@]}"
 fi
 
-# 13. Final Execution Summary Table
+# 13. Service Status Summary
 echo -e "\n${CYAN}======================================================================${NC}"
 echo -e "${CYAN} 📊 HOMELAB SERVICE STATUS SUMMARY ${NC}"
 echo -e "${CYAN}======================================================================${NC}"
@@ -215,21 +214,24 @@ print_service_status() {
     fi
 }
 
-print_service_status "Portainer (HDD)" "${ENABLE_PORTAINER}" "${PORTAINER_HTTP_PORT:-9000}" "http://192.168.1.75:9000"
-print_service_status "Uptime Kuma (HDD)" "${ENABLE_UPTIME_KUMA}" "${UPTIME_KUMA_PORT:-3001}" "http://192.168.1.75:3001"
-print_service_status "Dashy (SSD)" "${ENABLE_DASHY}" "${DASHBOARD_PORT:-7575}" "http://192.168.1.75:7575"
-print_service_status "IT-Tools (SSD)" "${ENABLE_IT_TOOLS}" "${IT_TOOLS_PORT:-8091}" "http://192.168.1.75:8091"
+HOST_IP="${HOST_IP:-$(hostname -I 2>/dev/null | awk '{print $1}')}"
+HOST_IP="${HOST_IP:-127.0.0.1}"
+
+print_service_status "Portainer (HDD)" "${ENABLE_PORTAINER}" "${PORTAINER_HTTP_PORT:-9000}" "http://${HOST_IP}:9000"
+print_service_status "Uptime Kuma (HDD)" "${ENABLE_UPTIME_KUMA}" "${UPTIME_KUMA_PORT:-3001}" "http://${HOST_IP}:3001"
+print_service_status "Dashy (SSD)" "${ENABLE_DASHY}" "${DASHBOARD_PORT:-7575}" "http://${HOST_IP}:7575"
+print_service_status "IT-Tools (SSD)" "${ENABLE_IT_TOOLS}" "${IT_TOOLS_PORT:-8091}" "http://${HOST_IP}:8091"
 print_service_status "Forgejo (SSD)" "${ENABLE_FORGEJO}" "${FORGEJO_HTTP_PORT:-3003}" "https://forgejo.baaankai.dpdns.org"
 print_service_status "ntfy (SSD)" "${ENABLE_NTFY}" "${NTFY_PORT:-8088}" "https://ntfy.baaankai.dpdns.org"
 print_service_status "Scrutiny (SSD)" "${ENABLE_SCRUTINY}" "${SCRUTINY_PORT:-8089}" "https://scrutiny.baaankai.dpdns.org"
 print_service_status "Maybe Finance (SSD)" "${ENABLE_MAYBE}" "${MAYBE_PORT:-8092}" "https://finance.baaankai.dpdns.org"
-print_service_status "Leantime (SSD)" "${ENABLE_LEANTIME}" "${LEANTIME_PORT:-8090}" "http://192.168.1.75:8090"
-print_service_status "Leantime Dev (SSD)" "${ENABLE_LEANTIME_DEV:-false}" "${LEANTIME_DEV_PORT:-8098}" "http://192.168.1.75:8098"
-print_service_status "ChangeDetection (SSD)" "${ENABLE_CHANGEDETECTION:-false}" "${CHANGEDETECTION_PORT:-5001}" "http://192.168.1.75:5001"
-print_service_status "Jellyfin (HDD)" "${ENABLE_JELLYFIN}" "${JELLYFIN_PORT:-8096}" "http://192.168.1.75:8096"
-print_service_status "Prometheus (SSD)" "${ENABLE_PROMETHEUS}" "${PROMETHEUS_PORT:-9093}" "http://192.168.1.75:9093"
-print_service_status "Grafana (SSD)" "${ENABLE_GRAFANA}" "${GRAFANA_PORT:-3005}" "http://192.168.1.75:3005"
-print_service_status "n8n (SSD)" "${ENABLE_N8N}" "${N8N_PORT:-5678}" "http://192.168.1.75:5678"
+print_service_status "Leantime (SSD)" "${ENABLE_LEANTIME}" "${LEANTIME_PORT:-8090}" "http://${HOST_IP}:8090"
+print_service_status "Leantime Dev (SSD)" "${ENABLE_LEANTIME_DEV}" "${LEANTIME_DEV_PORT:-8098}" "http://${HOST_IP}:8098"
+print_service_status "ChangeDetection (SSD)" "${ENABLE_CHANGEDETECTION}" "${CHANGEDETECTION_PORT:-5001}" "http://${HOST_IP}:5001"
+print_service_status "Jellyfin (HDD)" "${ENABLE_JELLYFIN}" "${JELLYFIN_PORT:-8096}" "http://${HOST_IP}:8096"
+print_service_status "Prometheus (SSD)" "${ENABLE_PROMETHEUS}" "${PROMETHEUS_PORT:-9093}" "http://${HOST_IP}:9093"
+print_service_status "Grafana (SSD)" "${ENABLE_GRAFANA}" "${GRAFANA_PORT:-3005}" "http://${HOST_IP}:3005"
+print_service_status "n8n (SSD)" "${ENABLE_N8N}" "${N8N_PORT:-5678}" "http://${HOST_IP}:5678"
 
 echo "--------------------------------------------------------------------------------"
 echo -e "${GREEN}[✓] Homelab category-wise dynamic orchestration completed successfully!${NC}"

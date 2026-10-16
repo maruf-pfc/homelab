@@ -13,30 +13,33 @@ set -euo pipefail
 GREEN='\033[0;32m'
 CYAN='\033[0;36m'
 YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
 echo -e "${CYAN}======================================================================${NC}"
 echo -e "${CYAN} 🚀 STARTING AUTOMATED BASH TERMINAL ENHANCEMENT SETUP ${NC}"
 echo -e "${CYAN}======================================================================${NC}"
+
+# Detect target user and home directory (even if executed with sudo)
+TARGET_USER="${SUDO_USER:-$USER}"
+USER_HOME="$(getent passwd "${TARGET_USER}" 2>/dev/null | cut -d: -f6)"
+USER_HOME="${USER_HOME:-$HOME}"
 
 # ------------------------------------------------------------------------------
 # 1. Install Oh My Posh & Download Themes
 # ------------------------------------------------------------------------------
 echo -e "\n${YELLOW}[1/4] Installing Oh My Posh and downloading themes...${NC}"
 
-if ! command -v oh-my-posh &> /dev/null; then
-    mkdir -p "$HOME/bin"
-    curl -shttps://ohmyposh.dev/install.sh | bash -s -- -d "$HOME/bin"
-    export PATH="$HOME/bin:$PATH"
+BIN_DIR="${USER_HOME}/bin"
+mkdir -p "${BIN_DIR}"
+if ! command -v oh-my-posh &> /dev/null && [ ! -f "${BIN_DIR}/oh-my-posh" ]; then
+    curl -sS https://ohmyposh.dev/install.sh | bash -s -- -d "${BIN_DIR}"
 fi
+export PATH="${BIN_DIR}:$PATH"
 
-mkdir -p "$HOME/.poshthemes"
-if command -v wget &> /dev/null && command -v unzip &> /dev/null; then
-    wget -q https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/themes.zip -O "$HOME/.poshthemes/themes.zip"
-    unzip -o -q "$HOME/.poshthemes/themes.zip" -d "$HOME/.poshthemes"
-    rm -f "$HOME/.poshthemes/themes.zip"
-else
-    curl -sSL https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/slim.omp.json -o "$HOME/.poshthemes/slim.omp.json"
+POSH_THEMES_DIR="${USER_HOME}/.poshthemes"
+mkdir -p "${POSH_THEMES_DIR}"
+if [ ! -f "${POSH_THEMES_DIR}/slim.omp.json" ]; then
+    curl -sSL https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/slim.omp.json -o "${POSH_THEMES_DIR}/slim.omp.json"
 fi
 
 echo -e "${GREEN}[✓] Oh My Posh & Themes installed successfully.${NC}"
@@ -46,19 +49,20 @@ echo -e "${GREEN}[✓] Oh My Posh & Themes installed successfully.${NC}"
 # ------------------------------------------------------------------------------
 echo -e "\n${YELLOW}[2/4] Installing Nerd Fonts (FiraCode & MesloLGS NF) for icons...${NC}"
 
-FONT_DIR="$HOME/.local/share/fonts"
-mkdir -p "$FONT_DIR"
+FONT_DIR="${USER_HOME}/.local/share/fonts"
+mkdir -p "${FONT_DIR}"
 
-# Download FiraCode Nerd Font if missing
-if [ ! -f "$FONT_DIR/FiraCodeNerdFont-Regular.ttf" ]; then
-    curl -sSL "https://github.com/ryanoasis/nerd-fonts/raw/main/patched-fonts/FiraCode/Regular/FiraCodeNerdFont-Regular.ttf" -o "$FONT_DIR/FiraCodeNerdFont-Regular.ttf"
+if ! fc-list : family 2>/dev/null | grep -q "FiraCode Nerd Font"; then
+    TMP_FONT_ZIP=$(mktemp)
+    curl -sSL "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/FiraCode.zip" -o "$TMP_FONT_ZIP"
+    unzip -o -q "$TMP_FONT_ZIP" -d "$FONT_DIR" "FiraCodeNerdFont*" 2>/dev/null || true
+    rm -f "$TMP_FONT_ZIP"
 fi
 
-# Download MesloLGS NF fonts if missing
 for font in "Regular" "Bold" "Italic" "Bold%20Italic"; do
     target_name=$(echo "MesloLGS NF ${font}.ttf" | sed 's/%20/ /g')
     if [ ! -f "$FONT_DIR/$target_name" ]; then
-        curl -sSL "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20${font}.ttf" -o "$FONT_DIR/$target_name" || true
+        curl -sSL "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20${font}.ttf" -o "$FONT_DIR/$target_name" 2>/dev/null || true
     fi
 done
 
@@ -73,7 +77,7 @@ echo -e "${GREEN}[✓] Nerd Fonts installed and font cache refreshed.${NC}"
 # ------------------------------------------------------------------------------
 echo -e "\n${YELLOW}[3/4] Installing ble.sh for real-time history auto-suggestions...${NC}"
 
-BLE_DIR="$HOME/.local/share/ble.sh"
+BLE_DIR="${USER_HOME}/.local/share/ble.sh"
 mkdir -p "$BLE_DIR"
 
 if [ ! -f "$BLE_DIR/ble.sh" ]; then
@@ -90,35 +94,48 @@ echo -e "${GREEN}[✓] ble.sh installed successfully.${NC}"
 # ------------------------------------------------------------------------------
 echo -e "\n${YELLOW}[4/4] Updating .bashrc and IDE terminal font settings...${NC}"
 
-BASHRC="$HOME/.bashrc"
+BASHRC="${USER_HOME}/.bashrc"
 
 # Ensure ble.sh top hook exists
-if ! grep -q "ble.sh/ble.sh" "$BASHRC"; then
-    sed -i '1s|^|[[ $- == *i* ]] && source ~/.local/share/ble.sh/ble.sh --noattach\n|' "$BASHRC"
+if ! grep -q "ble.sh/ble.sh" "$BASHRC" 2>/dev/null; then
+    sed -i '1s|^|[[ $- == *i* ]] \&\& source ~/.local/share/ble.sh/ble.sh --noattach\n|' "$BASHRC"
+fi
+
+# Ensure bin is in PATH for oh-my-posh
+if ! grep -q 'PATH="$HOME/bin:$PATH"' "$BASHRC" 2>/dev/null; then
+    echo '' >> "$BASHRC"
+    echo 'export PATH="$HOME/bin:$PATH"' >> "$BASHRC"
 fi
 
 # Ensure Oh My Posh initialization exists
-if ! grep -q "oh-my-posh init bash" "$BASHRC"; then
+if ! grep -q "oh-my-posh init bash" "$BASHRC" 2>/dev/null; then
     echo '' >> "$BASHRC"
     echo '# Oh My Posh Prompt Initialization' >> "$BASHRC"
     echo 'eval "$(oh-my-posh init bash --config ~/.poshthemes/slim.omp.json)"' >> "$BASHRC"
 fi
 
 # Ensure ble-attach exists at the bottom of .bashrc
-if ! grep -q "ble-attach" "$BASHRC"; then
+if ! grep -q "ble-attach" "$BASHRC" 2>/dev/null; then
     echo '' >> "$BASHRC"
     echo '# Enable ble.sh (real-time history auto-suggestions & syntax highlighting)' >> "$BASHRC"
     echo '[[ ${BLE_VERSION-} ]] && ble-attach' >> "$BASHRC"
 fi
 
 # Update VS Code / Antigravity IDE settings.json if present
-for settings_file in "$HOME/.config/Antigravity IDE/User/settings.json" "$HOME/.config/Code/User/settings.json" "$HOME/.config/Cursor/User/settings.json"; do
+for settings_file in "${USER_HOME}/.config/Antigravity IDE/User/settings.json" "${USER_HOME}/.config/Code/User/settings.json" "${USER_HOME}/.config/Cursor/User/settings.json"; do
     if [ -f "$settings_file" ]; then
         if ! grep -q "terminal.integrated.fontFamily" "$settings_file"; then
-            sed -i 's/}/,\n    "terminal.integrated.fontFamily": "FiraCode Nerd Font"\n}/' "$settings_file" || true
+            sed -i 's/}/,\n    "terminal.integrated.fontFamily": "MesloLGS NF, FiraCode Nerd Font"\n}/' "$settings_file" || true
+        else
+            sed -i 's/"terminal.integrated.fontFamily":.*/"terminal.integrated.fontFamily": "MesloLGS NF, FiraCode Nerd Font"/' "$settings_file" || true
         fi
     fi
 done
+
+# Fix ownership if script was run with sudo
+if [ -n "${SUDO_USER:-}" ]; then
+    chown -R "${TARGET_USER}:${TARGET_USER}" "${BIN_DIR}" "${POSH_THEMES_DIR}" "${FONT_DIR}" "${BLE_DIR}" "${BASHRC}" 2>/dev/null || true
+fi
 
 echo -e "\n${CYAN}======================================================================${NC}"
 echo -e "${GREEN} 🎉 ALL TERMINAL ENHANCEMENTS INSTALLED & CONFIGURED! ${NC}"

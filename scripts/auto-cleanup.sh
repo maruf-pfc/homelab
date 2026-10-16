@@ -104,9 +104,10 @@ fi
 # ------------------------------------------------------------------------------
 echo -e "\n${BOLD}${YELLOW}[4/5] Cleaning User-Level Caches & Tooling...${RESET}"
 
-# Explicitly target primary user directory
-user="maruf"
-user_dir="/home/maruf"
+# Dynamically target primary user directory
+user="${SUDO_USER:-$USER}"
+user_dir="$(getent passwd "${user}" 2>/dev/null | cut -d: -f6)"
+user_dir="${user_dir:-/home/${user}}"
 
 if [ -d "$user_dir" ]; then
     echo -e "${CYAN}--> Processing User:${RESET} ${BOLD}${user}${RESET} (${user_dir})"

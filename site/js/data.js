@@ -7,7 +7,7 @@ const HOMELAB_DATA = {
   system: {
     hostname: "mms",
     os: "Ubuntu Linux",
-    lanIp: "192.168.1.75",
+    lanIp: "192.168.1.73",
     domain: "baaankai.dpdns.org",
     ingress: "Cloudflare Zero Trust Tunnel (Host Systemd Daemon: cloudflared v2025.7.0)",
     networkBridge: "homelab (Docker Bridge, isolated)",
@@ -71,7 +71,7 @@ const HOMELAB_DATA = {
       database: "BoltDB",
       description: "Centralized GUI for Docker container lifecycle, image repository pruning, volume inspections, and stack composition.",
       healthcheck: "Docker engine ping & web endpoint",
-      url: "http://192.168.1.75:9000"
+      url: "http://192.168.1.73:9000"
     },
     {
       id: "it-tools",
@@ -86,7 +86,7 @@ const HOMELAB_DATA = {
       database: "Stateless (Client-side)",
       description: "Collection of handy online tools for developers and sysadmins (token generators, converters, regex testers, hash calculators).",
       healthcheck: "HTTP 200 GET /",
-      url: "http://192.168.1.75:8091"
+      url: "http://192.168.1.73:8091"
     },
     {
       id: "forgejo",
@@ -164,7 +164,7 @@ const HOMELAB_DATA = {
       database: "PostgreSQL 15 (maybe-db) + Redis 7",
       description: "Personal wealth and net worth tracking engine. Aggregates multi-currency accounts, investment performance, and financial trajectory.",
       healthcheck: "Depends on maybe-db (condition: service_healthy) & maybe-redis",
-      url: "http://192.168.1.75:8092"
+      url: "http://192.168.1.73:8092"
     },
     {
       id: "maybe-db",
@@ -209,7 +209,7 @@ const HOMELAB_DATA = {
       database: "SQLite",
       description: "Self-hosted media system for 4K movies, TV series, lossless music, and personal videos with hardware transcoding acceleration.",
       healthcheck: "HTTP GET /health",
-      url: "http://192.168.1.75:8096"
+      url: "http://192.168.1.73:8096"
     },
     {
       id: "prometheus",
@@ -224,7 +224,7 @@ const HOMELAB_DATA = {
       database: "Prometheus TSDB",
       description: "Time-series metrics scraping engine querying Node Exporter and cAdvisor every 15 seconds. Retention stored on high-capacity HDD.",
       healthcheck: "HTTP GET /-/healthy",
-      url: "http://192.168.1.75:9093"
+      url: "http://192.168.1.73:9093"
     },
     {
       id: "grafana",
@@ -239,7 +239,7 @@ const HOMELAB_DATA = {
       database: "SQLite state",
       description: "Observability analytics platform visualizing host CPU, RAM, disk I/O, network throughput, and per-container resource metrics.",
       healthcheck: "HTTP GET /api/health",
-      url: "http://192.168.1.75:3005"
+      url: "http://192.168.1.73:3005"
     },
     {
       id: "node-exporter",
@@ -254,7 +254,7 @@ const HOMELAB_DATA = {
       database: "Stateless",
       description: "Host hardware metrics exporter reading CPU cores, memory allocation, filesystem saturation, and thermal sensor outputs.",
       healthcheck: "Prometheus scrape target healthy",
-      url: "http://192.168.1.75:9100/metrics"
+      url: "http://192.168.1.73:9100/metrics"
     },
     {
       id: "cadvisor",
@@ -269,7 +269,7 @@ const HOMELAB_DATA = {
       database: "Stateless",
       description: "Container runtime performance analyzer tracking memory limits, CPU throttles, and network packet rates per Docker container.",
       healthcheck: "HTTP GET /healthz",
-      url: "http://192.168.1.75:8083"
+      url: "http://192.168.1.73:8083"
     },
     {
       id: "scrutiny",
@@ -300,7 +300,7 @@ const HOMELAB_DATA = {
       database: "Stateless",
       description: "Complete browser-based PDF manipulation suite: split, merge, convert, OCR, sign, compress, and edit PDF files securely.",
       healthcheck: "HTTP GET /api/v1/info/status",
-      url: "http://192.168.1.75:8084"
+      url: "http://192.168.1.73:8084"
     },
     {
       id: "memos",
@@ -315,7 +315,7 @@ const HOMELAB_DATA = {
       database: "SQLite",
       description: "Lightweight, privacy-first markdown memo hub for capturing quick daily thoughts, code snippets, and structured tags.",
       healthcheck: "HTTP GET /api/v1/ping",
-      url: "http://192.168.1.75:5230"
+      url: "http://192.168.1.73:5230"
     },
     {
       id: "vikunja",
@@ -330,7 +330,7 @@ const HOMELAB_DATA = {
       database: "SQLite / Postgres",
       description: "End-to-end task manager supporting subtasks, attachments, Kanban boards, Gantt timeline charts, and reminder alerts.",
       healthcheck: "HTTP GET /api/v1/info",
-      url: "http://192.168.1.75:3456"
+      url: "http://192.168.1.73:3456"
     },
     {
       id: "changedetection",
@@ -345,7 +345,7 @@ const HOMELAB_DATA = {
       database: "SQLite / JSON",
       description: "Automated web page monitor detecting price drops, stock changes, and text updates with notification dispatcher integration.",
       healthcheck: "HTTP GET /",
-      url: "http://192.168.1.75:5001"
+      url: "http://192.168.1.73:5001"
     },
     {
       id: "sonarr",
@@ -360,7 +360,7 @@ const HOMELAB_DATA = {
       database: "SQLite",
       description: "Automated TV show PVR managing episode releases, quality upgrades, renaming rules, and indexer integration.",
       healthcheck: "HTTP GET /ping",
-      url: "http://192.168.1.75:8989"
+      url: "http://192.168.1.73:8989"
     },
     {
       id: "radarr",
@@ -375,7 +375,7 @@ const HOMELAB_DATA = {
       database: "SQLite",
       description: "Automated movie library manager watching upcoming releases, parsing metadata, and managing downloads.",
       healthcheck: "HTTP GET /ping",
-      url: "http://192.168.1.75:7878"
+      url: "http://192.168.1.73:7878"
     },
     {
       id: "lidarr",
@@ -390,7 +390,7 @@ const HOMELAB_DATA = {
       database: "SQLite",
       description: "Automated music collection manager syncing discographies via MusicBrainz.",
       healthcheck: "HTTP GET /ping",
-      url: "http://192.168.1.75:8686"
+      url: "http://192.168.1.73:8686"
     },
     {
       id: "prowlarr",
@@ -405,7 +405,7 @@ const HOMELAB_DATA = {
       database: "SQLite",
       description: "Torrent and Usenet indexer proxy syncing tracker credentials with Sonarr, Radarr, and Lidarr.",
       healthcheck: "HTTP GET /ping",
-      url: "http://192.168.1.75:9696"
+      url: "http://192.168.1.73:9696"
     },
     {
       id: "navidrome",
@@ -420,7 +420,7 @@ const HOMELAB_DATA = {
       database: "SQLite",
       description: "Modern, Subsonic-compatible streaming music server with instant search, multi-user support, and mobile syncing.",
       healthcheck: "HTTP GET /ping",
-      url: "http://192.168.1.75:4533"
+      url: "http://192.168.1.73:4533"
     },
     {
       id: "audiobookshelf",
@@ -435,7 +435,7 @@ const HOMELAB_DATA = {
       database: "SQLite",
       description: "Self-hosted audiobook and podcast server with position syncing across native iOS and Android apps.",
       healthcheck: "HTTP GET /healthcheck",
-      url: "http://192.168.1.75:13378"
+      url: "http://192.168.1.73:13378"
     },
     {
       id: "qbittorrent",
@@ -450,7 +450,7 @@ const HOMELAB_DATA = {
       database: "Flat Files",
       description: "High-performance BitTorrent download client with Web UI and automated categorizer.",
       healthcheck: "HTTP GET /api/v2/app/version",
-      url: "http://192.168.1.75:8087"
+      url: "http://192.168.1.73:8087"
     },
     {
       id: "homepage",
@@ -465,7 +465,7 @@ const HOMELAB_DATA = {
       database: "YAML Config",
       description: "Fast, elegant dashboard with direct Docker socket discovery and live service stat widgets.",
       healthcheck: "HTTP GET /api/healthcheck",
-      url: "http://192.168.1.75:3000"
+      url: "http://192.168.1.73:3000"
     },
     {
       id: "glance",
@@ -480,7 +480,7 @@ const HOMELAB_DATA = {
       database: "YAML Config",
       description: "Ultra-fast single-page feed dashboard aggregating RSS news, Reddit subs, server metrics, and weather.",
       healthcheck: "HTTP GET /",
-      url: "http://192.168.1.75:8081"
+      url: "http://192.168.1.73:8081"
     },
     {
       id: "adguard",
@@ -495,7 +495,7 @@ const HOMELAB_DATA = {
       database: "Internal YAML storage",
       description: "Network-wide DNS ad-blocker, tracker sinkhole, parental control, and local domain rewrite resolver.",
       healthcheck: "DNS query resolution test",
-      url: "http://192.168.1.75:3002"
+      url: "http://192.168.1.73:3002"
     },
     {
       id: "vaultwarden",
@@ -510,7 +510,7 @@ const HOMELAB_DATA = {
       database: "SQLite",
       description: "Lightweight, official Bitwarden-compatible password vault server with 2FA, passkeys, and organization sharing.",
       healthcheck: "HTTP GET /alive",
-      url: "http://192.168.1.75:8082"
+      url: "http://192.168.1.73:8082"
     },
     {
       id: "immich",
@@ -525,7 +525,7 @@ const HOMELAB_DATA = {
       database: "PostgreSQL + pgvector + Redis",
       description: "Self-hosted Google Photos alternative with AI face recognition, semantic image search, and mobile camera backup.",
       healthcheck: "HTTP GET /api/server-info/ping",
-      url: "http://192.168.1.75:2283"
+      url: "http://192.168.1.73:2283"
     },
     {
       id: "home-assistant",
@@ -540,7 +540,7 @@ const HOMELAB_DATA = {
       database: "SQLite",
       description: "Open-source home automation hub linking Zigbee/Z-Wave devices, sensors, smart lighting, and scripts.",
       healthcheck: "HTTP GET /manifest.json",
-      url: "http://192.168.1.75:8123"
+      url: "http://192.168.1.73:8123"
     },
     {
       id: "ollama",
@@ -555,7 +555,7 @@ const HOMELAB_DATA = {
       database: "Stateless (Model Binaries)",
       description: "Local large language model runner supporting Llama 3, Qwen 2.5, DeepSeek, and Mistral with GPU acceleration.",
       healthcheck: "HTTP GET /api/tags",
-      url: "http://192.168.1.75:11434"
+      url: "http://192.168.1.73:11434"
     },
     {
       id: "open-webui",
@@ -570,7 +570,7 @@ const HOMELAB_DATA = {
       database: "SQLite",
       description: "ChatGPT-grade user interface for local LLMs featuring multi-model chats, document RAG, and tool calling.",
       healthcheck: "HTTP GET /health",
-      url: "http://192.168.1.75:8080"
+      url: "http://192.168.1.73:8080"
     },
     {
       id: "n8n",
@@ -585,7 +585,7 @@ const HOMELAB_DATA = {
       database: "SQLite / PostgreSQL",
       description: "Fair-code node-based workflow automation platform for connecting APIs, databases, webhooks, and AI pipelines.",
       healthcheck: "HTTP GET /healthz",
-      url: "http://192.168.1.75:5678"
+      url: "http://192.168.1.73:5678"
     }
   ],
 

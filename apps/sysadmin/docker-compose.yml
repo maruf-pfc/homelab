@@ -3,6 +3,7 @@ services:
     image: portainer/portainer-ce:latest
     container_name: portainer
     restart: unless-stopped
+    command: --no-setup-token
     ports:
       - "${PORTAINER_TUNNEL_PORT:-8000}:8000"
       - "${PORTAINER_HTTP_PORT:-9000}:9000"
