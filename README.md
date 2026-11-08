@@ -53,6 +53,8 @@ flowchart TD
                 MAY_DB[("PostgreSQL 15 + Redis\n(Internal Only)")]
                 LEAN["Leantime (8090)"]
                 LEAN_DB[("MariaDB 11\n(Internal Only)")]
+                TREST["Trestle Workspace (8338)"]
+                TREST_DB[("PostgreSQL 18\n(Internal Only)")]
                 NOTE["Memos (5230) · Vikunja (3456) · Stirling PDF (8084)"]
             end
             
@@ -80,11 +82,13 @@ flowchart TD
     CFT -->|Internal Route| JEL
     CFT -->|Internal Route| MAY
     CFT -->|Internal Route| LEAN
+    CFT -->|Internal Route| TREST
     CFT -->|Internal Route| GRAF
     CFT -->|Internal Route| ARR
 
     MAY -.->|Healthy Check| MAY_DB
     LEAN -.->|Healthy Check| LEAN_DB
+    TREST -.->|Healthy Check| TREST_DB
 ```
 
 ---
@@ -130,7 +134,7 @@ sequenceDiagram
     participant Cron as Cron (03:00 AM)
     participant Script as scripts/backup.sh
     participant MariaDB as Leantime DB
-    participant Postgres as Maybe DB
+    participant Postgres as Maybe & Trestle DB
     participant SSD as SSD Volumes
     participant HDD as HDD Storage Bay
 
@@ -168,6 +172,8 @@ sequenceDiagram
 | **Maybe Postgres** | Finance & Wealth | `5432` (Internal) | SSD | Dedicated PostgreSQL 15 database instance |
 | **Leantime** | Productivity | `8090` | SSD | Agile project management and strategy workspace |
 | **Leantime MariaDB** | Productivity | `3306` (Internal) | SSD | MariaDB 11 transactional storage engine |
+| **Trestle** | Productivity | `8338` | SSD | Modern self-hosted workspace for canonical projects, tasks, time tracking & roadmaps |
+| **Trestle Postgres** | Productivity | `5432` (Internal) | SSD | Dedicated PostgreSQL 18 relational storage engine |
 | **ChangeDetection** | Productivity | `5001` | SSD | Real-time web page monitoring and diff alerting |
 | **Stirling PDF** | Productivity | `8084` | Stateless | Robust local PDF manipulation toolbox |
 | **Memos** | Productivity | `5230` | SSD | Privacy-first lightweight note-taking service |
@@ -218,7 +224,7 @@ sequenceDiagram
 │   ├── monitoring/               # Category 5: Observability (Prometheus, Grafana…)
 │   ├── storage/                  # Category 6: Storage & Cloud
 │   ├── security/                 # Category 7: Security & Auth
-│   ├── productivity/             # Category 8: Productivity (Leantime, ChangeDetection…)
+│   ├── productivity/             # Category 8: Productivity (Leantime, Trestle, ChangeDetection…)
 │   ├── automation/               # Category 9: Home Automation & IoT
 │   ├── sysadmin/                 # Category 10: Sysadmin (Portainer, IT-Tools, Forgejo)
 │   ├── ai/                       # Category 11: Local AI & LLM Hub
@@ -248,6 +254,7 @@ nano .env           # Configure secure passwords and storage paths
 In `.env`, toggle the services you wish to activate:
 ```bash
 ENABLE_LEANTIME=true
+ENABLE_TRESTLE=true
 ENABLE_MAYBE=true
 ENABLE_CHANGEDETECTION=true
 ENABLE_GRAFANA=true
@@ -273,7 +280,7 @@ Nightly automated snapshot runs at **03:00 AM** via cron:
 0 3 * * * /home/maruf/homelab/scripts/backup.sh >> /home/maruf/homelab/backups/backup.log 2>&1
 ```
 
-- **Transactional DB Snapshots**: Live dumps of MariaDB and PostgreSQL backends.
+- **Transactional DB Snapshots**: Live dumps of MariaDB and PostgreSQL backends (Maybe, Trestle).
 - **SSD Volume Tar**: Read-only atomic compression of `/home/maruf/homelab/volumes`.
 - **Secondary HDD Mirror**: Mirrored to `/home/maruf/MyHDDStorage/backups/`.
 - **Single Master Retention**: Keeps only the most recent clean archive to conserve storage.

@@ -50,6 +50,7 @@ ENABLE_SCRUTINY="${ENABLE_SCRUTINY:-false}"
 ENABLE_MAYBE="${ENABLE_MAYBE:-false}"
 ENABLE_LEANTIME="${ENABLE_LEANTIME:-true}"
 ENABLE_LEANTIME_DEV="${ENABLE_LEANTIME_DEV:-false}"
+ENABLE_TRESTLE="${ENABLE_TRESTLE:-true}"
 ENABLE_CHANGEDETECTION="${ENABLE_CHANGEDETECTION:-false}"
 ENABLE_JELLYFIN="${ENABLE_JELLYFIN:-true}"
 ENABLE_PROMETHEUS="${ENABLE_PROMETHEUS:-false}"
@@ -93,6 +94,7 @@ check_port_conflict() {
 [ "${ENABLE_MAYBE}" = "true" ] && check_port_conflict "Maybe Finance" "${MAYBE_PORT:-8092}"
 [ "${ENABLE_LEANTIME}" = "true" ] && check_port_conflict "Leantime" "${LEANTIME_PORT:-8090}"
 [ "${ENABLE_LEANTIME_DEV}" = "true" ] && check_port_conflict "Leantime Telegram" "${LEANTIME_DEV_PORT:-8098}"
+[ "${ENABLE_TRESTLE}" = "true" ] && check_port_conflict "Trestle" "${TRESTLE_PORT:-8338}"
 [ "${ENABLE_CHANGEDETECTION}" = "true" ] && check_port_conflict "ChangeDetection" "${CHANGEDETECTION_PORT:-5001}"
 [ "${ENABLE_JELLYFIN}" = "true" ] && check_port_conflict "Jellyfin" "${JELLYFIN_PORT:-8096}"
 [ "${ENABLE_PROMETHEUS}" = "true" ] && check_port_conflict "Prometheus" "${PROMETHEUS_PORT:-9093}"
@@ -162,9 +164,11 @@ PROD_SERVICES=()
 [ "${ENABLE_LEANTIME:-false}" = "true" ] && PROD_SERVICES+=(leantime-db leantime)
 [ "${ENABLE_LEANTIME_DEV:-false}" = "true" ] && PROD_SERVICES+=(leantime-db leantime-telegram)
 [ "${ENABLE_CHANGEDETECTION:-false}" = "true" ] && PROD_SERVICES+=(changedetection)
+[ "${ENABLE_TRESTLE:-false}" = "true" ] && PROD_SERVICES+=(trestle-db trestle)
 if [ ${#PROD_SERVICES[@]} -gt 0 ]; then
     mkdir -p "${SSD_BASE}/leantime/config" "${SSD_BASE}/leantime/mysql"
     [ "${ENABLE_CHANGEDETECTION:-false}" = "true" ] && mkdir -p "${SSD_BASE}/changedetection"
+    [ "${ENABLE_TRESTLE:-false}" = "true" ] && mkdir -p "${SSD_BASE}/trestle/postgres"
     run_stack_service "${ROOT_DIR}/apps/productivity/docker-compose.yml" "${PROD_SERVICES[@]}"
 fi
 
@@ -227,6 +231,7 @@ print_service_status "Scrutiny (SSD)" "${ENABLE_SCRUTINY}" "${SCRUTINY_PORT:-808
 print_service_status "Maybe Finance (SSD)" "${ENABLE_MAYBE}" "${MAYBE_PORT:-8092}" "https://finance.baaankai.dpdns.org"
 print_service_status "Leantime (SSD)" "${ENABLE_LEANTIME}" "${LEANTIME_PORT:-8090}" "http://${HOST_IP}:8090"
 print_service_status "Leantime Dev (SSD)" "${ENABLE_LEANTIME_DEV}" "${LEANTIME_DEV_PORT:-8098}" "http://${HOST_IP}:8098"
+print_service_status "Trestle (SSD)" "${ENABLE_TRESTLE}" "${TRESTLE_PORT:-8338}" "https://trestle.baaankai.dpdns.org"
 print_service_status "ChangeDetection (SSD)" "${ENABLE_CHANGEDETECTION}" "${CHANGEDETECTION_PORT:-5001}" "http://${HOST_IP}:5001"
 print_service_status "Jellyfin (HDD)" "${ENABLE_JELLYFIN}" "${JELLYFIN_PORT:-8096}" "http://${HOST_IP}:8096"
 print_service_status "Prometheus (SSD)" "${ENABLE_PROMETHEUS}" "${PROMETHEUS_PORT:-9093}" "http://${HOST_IP}:9093"

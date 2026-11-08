@@ -121,6 +121,37 @@ const HOMELAB_DATA = {
       url: "https://ntfy.baaankai.dpdns.org"
     },
     {
+      id: "trestle",
+      name: "Trestle Workspace",
+      category: "productivity",
+      status: "active",
+      hostPort: "8338",
+      internalPort: "3000",
+      storageTier: "SSD",
+      storagePath: "/home/maruf/homelab/volumes/trestle",
+      techStack: "Go / Svelte 5 / Vite",
+      database: "PostgreSQL 18 (trestle-db)",
+      domain: "trestle.baaankai.dpdns.org",
+      description: "Self-hosted workspace for canonical projects, tasks, live time tracking, milestone roadmaps, and chat integrations.",
+      healthcheck: "Depends on trestle-db (condition: service_healthy)",
+      url: "https://trestle.baaankai.dpdns.org"
+    },
+    {
+      id: "trestle-db",
+      name: "Trestle PostgreSQL 18",
+      category: "productivity",
+      status: "active",
+      hostPort: "5432 (Internal Only)",
+      internalPort: "5432",
+      storageTier: "SSD",
+      storagePath: "/home/maruf/homelab/volumes/trestle/postgres",
+      techStack: "PostgreSQL 18",
+      database: "Relational DB",
+      description: "Dedicated PostgreSQL 18 relational persistence engine for Trestle. Zero host port exposure — accessible only via the internal homelab network bridge.",
+      healthcheck: "pg_isready -h 127.0.0.1 -U trestle -d trestle",
+      url: "Internal bridge network"
+    },
+    {
       id: "leantime",
       name: "Leantime Project Hub",
       category: "productivity",

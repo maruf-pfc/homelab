@@ -157,6 +157,7 @@ A comprehensive, curated reference guide to premier open-source desktop software
 | **Harper** | Privacy-First Grammar Checker | Linux / macOS / Win | ⚡ Ultra-Light | High-performance, offline grammar and spell checker written in Rust; integrates into editors, IDEs, and browsers with zero cloud telemetry. | `Rust` | Grammarly / LanguageTool |
 | **RenderCV** | Code-Driven Resume Generator | Linux / macOS / Win | ⚡ Ultra-Light | Developer-first CV and resume engine that compiles clean YAML files into ATS-friendly, publication-quality PDFs and LaTeX. | `Python / Typst / LaTeX` | Canva / Overleaf Templates |
 | **Kimai** | Time Tracking & Invoicing | Linux / macOS / Win (Web/App) | 🟢 Lightweight | Open-source time-tracking and timesheet management platform with client invoicing, budget alerts, and productivity analytics. | `PHP (Symfony)` | Toggl Track / Harvest |
+| **Trestle** | Workspace & Task Management | Linux / macOS / Win (Web/Self-Hosted) | 🟢 Lightweight | Modern self-hosted workspace for canonical projects, issue tracking, milestones, live time tracking, and chat integrations. | `Go / Svelte 5 / Vite` | Linear / Jira / Toggl |
 
 ---
 

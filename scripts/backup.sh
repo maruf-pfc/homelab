@@ -39,6 +39,11 @@ if docker ps --format '{{.Names}}' | grep -Eq '^maybe-db$'; then
     docker exec maybe-db pg_dumpall -U "${MAYBE_DB_USER:-maybe}" > "${BACKUP_DIR}/maybe_db_dump.sql" 2>/dev/null || echo "[!] PostgreSQL dump warning."
 fi
 
+if docker ps --format '{{.Names}}' | grep -Eq '^trestle-db$'; then
+    echo "[+] Exporting PostgreSQL dump for Trestle..."
+    docker exec trestle-db pg_dumpall -U "${TRESTLE_DB_USER:-trestle}" > "${BACKUP_DIR}/trestle_db_dump.sql" 2>/dev/null || echo "[!] PostgreSQL dump warning."
+fi
+
 # 2. Archive SSD Configurations & Volumes
 echo "[+] Archiving SSD configurations, .env, and volumes..."
 docker run --rm -v "${ROOT_DIR}:/src:ro" -v "${BACKUP_DIR}:/dst" alpine sh -c \

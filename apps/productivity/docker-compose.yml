@@ -106,6 +106,42 @@ services:
     networks:
       - homelab
 
+  trestle-db:
+    image: postgres:18-bookworm
+    container_name: trestle-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${TRESTLE_DB_NAME:-trestle}
+      POSTGRES_USER: ${TRESTLE_DB_USER:-trestle}
+      POSTGRES_PASSWORD: ${TRESTLE_DB_PASSWORD:-trestlepassword}
+    volumes:
+      - ${SSD_DATA_DIR:-/home/maruf/homelab/volumes}/trestle/postgres:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U ${TRESTLE_DB_USER:-trestle} -d ${TRESTLE_DB_NAME:-trestle}"]
+      start_period: 20s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - homelab
+
+  trestle:
+    image: marufsarker/trestle:latest
+    container_name: trestle
+    restart: unless-stopped
+    depends_on:
+      trestle-db:
+        condition: service_healthy
+    entrypoint: ["sh", "-c", "/app/trestle migrate && /app/trestle"]
+    ports:
+      - "${TRESTLE_PORT:-8338}:3000"
+    environment:
+      DATABASE_URL: "${TRESTLE_DATABASE_URL:-postgres://${TRESTLE_DB_USER:-trestle}:${TRESTLE_DB_PASSWORD:-trestlepassword}@trestle-db:5432/${TRESTLE_DB_NAME:-trestle}?sslmode=disable}"
+      TRESTLE_BIND_ADDR: "0.0.0.0:3000"
+      TRESTLE_DEV_MODE: "false"
+    networks:
+      - homelab
+
 networks:
   homelab:
     external: true

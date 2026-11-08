@@ -161,6 +161,7 @@ A comprehensive, categorized reference guide to popular open-source and self-hos
 | App / Tool | Category | Port | Footprint | Description | Tech Stack & Database | Storage |
 | :--- | :--- | :---: | :---: | :--- | :--- | :--- |
 | **Leantime** | Project Management | `8090` | 🟡 Moderate | Lean project management platform designed for developers. *(Active)* | `PHP / Vue` / `MariaDB / MySQL` | SSD |
+| **Trestle** | Workspace & Tasks | `8338` | 🟢 Lightweight | Modern self-hosted workspace for canonical projects, issue tracking, milestones, live time tracking, and chat integrations. *(Active in homelab)* | `Go / Svelte 5 / Vite` / `PostgreSQL 18` | SSD |
 | **Kimai** | Time Tracking & Invoices | `8095` | 🟢 Lightweight | Full-featured time tracker with project budgets, client invoicing & timesheets. | `PHP (Symfony)` / `MariaDB` | SSD |
 | **Vikunja** | Task & ToDo Manager | `3456` | 🟢 Lightweight | Feature-rich task manager with ToDo lists, Kanban, Gantt charts, and reminders. | `Go / Vue` / `SQLite / Postgres` | SSD |
 | **Planka** | Kanban Board | `1337` | 🟢 Lightweight | Elegant real-time Kanban board for project tracking (Trello alternative). | `Node.js / React` / `PostgreSQL` | SSD |
